@@ -9,6 +9,9 @@ const utils = require(__dirname + "/utils.js");
 const express = require("express");
 const cors = require('cors')
 const bodyParser = require("body-parser");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
 const app = express();
 app.use(cors())
 // Prepare server for Bootstrap, jQuery and PowerBI files
@@ -50,5 +53,5 @@ app.get('/getEmbedToken', async function (req, res) {
     // result.status specified the statusCode that will be sent along with the result object
     res.status(result.status).send(result);
 });
-
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port, () => console.log(`Listening on port ${port}`));
