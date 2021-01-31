@@ -7,9 +7,10 @@ let path = require('path');
 let embedToken = require(__dirname + '/embedConfigService.js');
 const utils = require(__dirname + "/utils.js");
 const express = require("express");
+const cors = require('cors')
 const bodyParser = require("body-parser");
 const app = express();
-
+app.use(cors())
 // Prepare server for Bootstrap, jQuery and PowerBI files
 app.use('/js', express.static('./node_modules/bootstrap/dist/js/')); // Redirect bootstrap JS
 app.use('/js', express.static('./node_modules/jquery/dist/')); // Redirect JS jQuery
@@ -25,10 +26,14 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+//@remove this when React App is functioning
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/../views/index.html'));
 });
-
+//test for connection react 
+app.get('/test', (req,res) =>{
+    res.send({ express: 'Test from Express' });
+} );
 app.get('/getEmbedToken', async function (req, res) {
 
     // Validate whether all the required configurations are provided in config.json
