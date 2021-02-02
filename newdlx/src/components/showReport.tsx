@@ -4,7 +4,7 @@ import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import PowerBIReport from "./powerBiReport";
 
-export function SalesReports(props:any) {
+export default function SalesReports(props:any) {
   const useStyles = makeStyles(theme => ({
     paper: {
       background: theme.palette.type == "light" ? "#fff" : "#474747"

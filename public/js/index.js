@@ -30,7 +30,7 @@ $.ajax({
             //     background: models.BackgroundType.Transparent
             // }
         };
-
+        console.log(embedData)
         // Use the token expiry to regenerate Embed token for seamless end user experience
         // Refer https://aka.ms/RefreshEmbedToken
         tokenExpiry = embedData.expiry;
