@@ -1,11 +1,7 @@
-// ----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-// ----------------------------------------------------------------------------
 
 let path = require('path');
-let embedToken = require(__dirname + '/embedConfigService.js');
-const utils = require(__dirname + "/utils.js");
+let embedToken = require('./embedConfigService.js');
+const utils = require("./utils.js");
 const express = require("express");
 const cors = require('cors')
 const bodyParser = require("body-parser");
