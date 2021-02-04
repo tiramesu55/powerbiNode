@@ -63,35 +63,41 @@ function App (): JSX.Element {
                                     })
                                     .catch(err => console.log(err));
   useEffect(() => {    
+    console.log('call...')
     getToken();
+    let timerId = setInterval(() => getToken(), 1000*60*10);
+ //   timerId;
+    return () => {
+      clearInterval(timerId)
+    };
   }, []);
 
 
 
 	// Map of event handlers to be applied to the embedding report
-	const eventHandlersMap = new Map([
-		['loaded', function () {
-			console.log('Report has loaded');
-		}],
-		['rendered', function () {
-			console.log('Report has rendered');
+	// const eventHandlersMap = new Map([
+	// 	['loaded', function () {
+	// 		console.log('Report has loaded');
+	// 	}],
+	// 	['rendered', function () {
+	// 		console.log('Report has rendered');
 			
-			// Update display message
-			setMessage('The report is rendered')
-		}],
-		['error', async function (event?: service.ICustomEvent<any>) { 
-			if (event) {
-        console.error(event.detail);
-        await getToken();
-        report && report.refresh().catch(error => { console.log( error ) });
-			}
-		}]
-	]);
+	// 		// Update display message
+	// 		setMessage('The report is rendered')
+	// 	}],
+	// 	['error', async function (event?: service.ICustomEvent<any>) { 
+	// 		if (event) {
+  //       console.error(event.detail);
+  //       await getToken();
+  //       report && report.refresh().catch(error => { console.log( error ) });
+	// 		}
+	// 	}]
+	// ]);
 
-  const testClick = async () => {
-    await getToken();
-    report && report.refresh().catch(error => { console.log( error ) });
-  }
+  // const testClick = async () => {
+  //   await getToken();
+  //   report && report.refresh().catch(error => { console.log( error ) });
+  // }
 	const changeSettings = () => {
 		// Update the state "sampleReportConfig" and re-render DemoApp component
 		setReportConfig({
@@ -112,7 +118,7 @@ function App (): JSX.Element {
    <div>
   <div style={{height: "100%"}}>{sampleReportConfig.status === 200 && <PowerBIEmbed
     embedConfig = {sampleReportConfig}
-    eventHandlers = {eventHandlersMap}
+//    eventHandlers = {eventHandlersMap}
     cssClassName = { "report-style-class" }
     getEmbeddedComponent = { (embedObject:Embed) => {
       console.log(`Embedded object of type "${ embedObject.embedtype }" received`);
@@ -120,7 +126,7 @@ function App (): JSX.Element {
     } }
   />}
   </div>
-  <button onClick={testClick}>Test click</button>
+  {/* <button onClick={testClick}>Test click</button> */}
   </div>
  )
 }
