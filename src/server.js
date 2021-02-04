@@ -46,10 +46,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-//@remove this when React App is functioning
-// app.get('/', function (req, res) {
-//     res.sendFile(path.join(__dirname + '/../views/index.html'));
-// });
 // //test for connection react 
 // app.get('/test', (req,res) =>{
 //     res.send({ express: 'Test from Express' });

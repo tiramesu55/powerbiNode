@@ -1,7 +1,7 @@
 import React, {useEffect, useState, FunctionComponent } from 'react';
 import axios from 'axios';
 import { useTheme } from '@material-ui/core/styles';
-import SalesReports from "./components/showReport";
+//import SalesReports from "./components/showReport";
 import { PowerBIEmbed } from 'powerbi-client-react';
 import { models, Report, Embed, IEmbedConfiguration, service, Page } from 'powerbi-client';
 import "./App.css"
@@ -99,7 +99,7 @@ function App (): JSX.Element {
   //   report && report.refresh().catch(error => { console.log( error ) });
   // }
 	const changeSettings = () => {
-		// Update the state "sampleReportConfig" and re-render DemoApp component
+	
 		setReportConfig({
 			...sampleReportConfig,
 			settings: {
