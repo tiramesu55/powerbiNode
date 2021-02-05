@@ -3,7 +3,8 @@ import axios from 'axios';
 import { useTheme } from '@material-ui/core/styles';
 //import SalesReports from "./components/showReport";
 import { PowerBIEmbed } from 'powerbi-client-react';
-import { models, Report, Embed, IEmbedConfiguration, service, Page } from 'powerbi-client';
+import { models, Report, Embed,  IEmbedConfiguration, service, Page, IReportEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
+
 import "./App.css"
 interface ReportConfig {
   type: string,
@@ -22,6 +23,16 @@ interface apiConfig {
   expiry: string,
   status: number
 }
+
+const layoutSettings = {
+   displayOption: models.DisplayOption.FitToWidth
+} as models.ICustomLayout
+
+const renderSettings = {
+  layoutType: models.LayoutType.Custom,
+  customLayout: layoutSettings
+} as IEmbedSettings
+
 function App (): JSX.Element {
 
 	const [report, setReport] = useState<Report>();
@@ -29,6 +40,9 @@ function App (): JSX.Element {
 	// API end-point url to get embed config for a sample report
 	const sampleReportUrl = 'https://aka.ms/sampleReportEmbedConfig';
 
+  const renderSettings = {
+
+  } 
   const [sampleReportConfig, setReportConfig] = useState<ReportConfig>({
 		type: 'report',
     embedUrl: '',
@@ -115,8 +129,8 @@ function App (): JSX.Element {
 
 
  return (
-   <div>
-  <div style={{height: "100%"}}>{sampleReportConfig.status === 200 && <PowerBIEmbed
+
+  <div >{sampleReportConfig.status === 200 && <PowerBIEmbed
     embedConfig = {sampleReportConfig}
 //    eventHandlers = {eventHandlersMap}
     cssClassName = { "report-style-class" }
@@ -126,8 +140,7 @@ function App (): JSX.Element {
     } }
   />}
   </div>
-  {/* <button onClick={testClick}>Test click</button> */}
-  </div>
+
  )
 }
 
