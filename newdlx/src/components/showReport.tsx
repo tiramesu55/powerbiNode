@@ -1,20 +1,20 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import PowerBIReport from "./powerBiReport";
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Box from '@material-ui/core/Box';
+import PowerBIReport from './powerBiReport';
 
-export default function SalesReports(props:any) {
-  const useStyles = makeStyles(theme => ({
-    paper: {
-      background: theme.palette.type == "light" ? "#fff" : "#474747"
-      },
-      reportContainer: {
-          height: "calc(100vh - 100px)"
-      }
-  }));
+export default function SalesReports(props: any) {
+    const useStyles = makeStyles((theme) => ({
+        paper: {
+            background: theme.palette.type == 'light' ? '#fff' : '#474747',
+        },
+        reportContainer: {
+            height: 'calc(100vh - 100px)',
+        },
+    }));
 
-  const classes = useStyles(props.theme);
+    const classes = useStyles(props.theme);
 
     return (
         <Paper className={classes.paper}>
