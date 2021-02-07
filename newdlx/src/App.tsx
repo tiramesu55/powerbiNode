@@ -6,17 +6,6 @@ import { PowerBIEmbed } from 'powerbi-client-react';
 import { models, Report, Embed,  IEmbedConfiguration, service, Page, IReportEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
 
 import "./App.css"
-interface ReportConfig {
-  type: string,
-  tokenType: number,
-  accessToken: string,
-  embedUrl: string,
-  reportId: string,
-  expiry: string,
-  status: number,
-  settings: any
-}
-
 interface apiConfig {
   accessToken: string,
   embedUrl: any[],
@@ -25,7 +14,7 @@ interface apiConfig {
 }
 
 const layoutSettings = {
-   displayOption: models.DisplayOption.FitToWidth
+   displayOption: models.DisplayOption.ActualSize
 } as models.ICustomLayout
 
 const renderSettings = {
@@ -37,28 +26,13 @@ function App (): JSX.Element {
 
 	const [report, setReport] = useState<Report>();
 
-	// API end-point url to get embed config for a sample report
-	const sampleReportUrl = 'https://aka.ms/sampleReportEmbedConfig';
-
-  const renderSettings = {
-
-  } 
-  const [sampleReportConfig, setReportConfig] = useState<ReportConfig>({
+  const [sampleReportConfig, setReportConfig] = useState<IReportEmbedConfiguration>({
 		type: 'report',
     embedUrl: '',
     tokenType: models.TokenType.Embed,
-		reportId: '',
+		id: '',
     accessToken: '',
-    expiry: '',
-    status: 0,
-		settings: {
-      panes: {
-        filters: {
-          expanded: true,
-          visible: true
-        }
-      }
-    },
+		settings: renderSettings,
 	});
   const [displayMessage, setMessage] = useState(`The report is bootstrapped. Click the Embed Report button to set the access token`);
 
@@ -69,9 +43,7 @@ function App (): JSX.Element {
                                           ...sampleReportConfig,
                                           embedUrl: resp.data.embedUrl[0].embedUrl,
                                           accessToken: resp.data.accessToken,
-                                          reportId: resp.data.embedUrl[0].reportId,
-                                          expiry: resp.data.expiry,
-                                          status: resp.data.status
+                                          id: resp.data.embedUrl[0].reportId
                                       }
                                       setReportConfig(reportCon)
                                     })
@@ -112,25 +84,25 @@ function App (): JSX.Element {
   //   await getToken();
   //   report && report.refresh().catch(error => { console.log( error ) });
   // }
-	const changeSettings = () => {
+	// const changeSettings = () => {
 	
-		setReportConfig({
-			...sampleReportConfig,
-			settings: {
-				panes: {
-					filters: {
-						expanded: false,
-						visible: false
-					}
-				}
-			}
-		});
-	};
+	// 	setReportConfig({
+	// 		...sampleReportConfig,
+	// 		settings: {
+	// 			panes: {
+	// 				filters: {
+	// 					expanded: false,
+	// 					visible: false
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// };
 
 
  return (
 
-  <div >{sampleReportConfig.status === 200 && <PowerBIEmbed
+  <div >{sampleReportConfig.id && <PowerBIEmbed
     embedConfig = {sampleReportConfig}
 //    eventHandlers = {eventHandlersMap}
     cssClassName = { "report-style-class" }
