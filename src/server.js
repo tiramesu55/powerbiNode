@@ -49,28 +49,104 @@ app.use(bodyParser.urlencoded({
 /**
  * @swagger
  *
- * /getEmbedToken:
- *   get:
- *     description: Get token
+ * /getReport:
+ *   post:
+ *     summary: Get report by id
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: reportId
+ *         in: formData
+ *         required: true
+ *         type: string
  *     responses: 
  *       '200': 
  *          description: A successful response
  */
-app.get('/getEmbedToken', async function (req, res) {
+app.post('/getReport', async function (req, res) {
+    try {
+        // Validate whether all the required configurations are provided in config.json
+        configCheckResult = utils.validateConfig();
+        if (configCheckResult) {
+            return {
+                "status": 400,
+                "error": configCheckResult
+            };
+        }
+        // Get the details like Embed URL, Access token and Expiry
+        const result = await embedToken.getEmbedParamsForSingleReport("b5a65efe-66b0-4163-a318-c83b90d1352a", req.body.reportId);
 
-    // Validate whether all the required configurations are provided in config.json
-    configCheckResult = utils.validateConfig();
-    if (configCheckResult) {
-        return {
-            "status": 400,
-            "error": configCheckResult
-        };
+        // result.status specified the statusCode that will be sent along with the result object
+        console.log( result )
+        res.status(200).send({
+            ...result.reportsDetail,
+            accessToken: result.embedToken.token,
+            expiry: result.embedToken.expiration,
+            status: 200
+        });
+    } catch(err) {
+        res.status(502).send({
+            error: err.toString()
+        })
     }
-    // Get the details like Embed URL, Access token and Expiry
-    let result = await embedToken.getEmbedInfo();
+});
+/**
+ * @swagger
+ *
+ * /getReportsByGroup:
+ *   get:
+ *     summary: Get reports by group
+ *     responses: 
+ *       '200': 
+ *          description: A successful response
+ */
+app.get('/getReportsByGroup', async function (req, res) {
+    try {
+        // Validate whether all the required configurations are provided in config.json
+        configCheckResult = utils.validateConfig();
+        if (configCheckResult) {
+            return {
+                "status": 400,
+                "error": configCheckResult
+            };
+        }
+        // Get the details like Embed URL, Access token and Expiry
+        let result = await embedToken.getReports("b5a65efe-66b0-4163-a318-c83b90d1352a");
 
-    // result.status specified the statusCode that will be sent along with the result object
-    res.status(result.status).send(result);
+        // result.status specified the statusCode that will be sent along with the result object
+        res.status(200).send(result);
+    } catch(err) {
+        console.log(err)
+    }
+});
+/**
+ * @swagger
+ *
+ * /getToken:
+ *   get:
+ *     summary: Get access token
+ *     responses: 
+ *       '200': 
+ *          description: A successful response
+ */
+app.get('/getToken', async function (req, res) {
+    try {
+        // Validate whether all the required configurations are provided in config.json
+        configCheckResult = utils.validateConfig();
+        if (configCheckResult) {
+            return {
+                "status": 400,
+                "error": configCheckResult
+            };
+        }
+        // Get the details like Embed URL, Access token and Expiry
+        let result = await embedToken.getToken();
+
+        // result.status specified the statusCode that will be sent along with the result object
+        res.status(200).send(result);
+    } catch(err) {
+        console.log(err)
+    }
 });
 
 //app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

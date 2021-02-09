@@ -37,14 +37,13 @@ async function getEmbedInfo() {
 }
 
 /**
- * Get embed params for a single report for a single workspace
+ * Get embed params for a single workspace
  * @param {string} workspaceId
- * @param {string} reportId
  * @param {string} additionalDatasetId - Optional Parameter
  * @return EmbedConfig object
  */
-async function getEmbedParamsForSingleReport(workspaceId, reportId, additionalDatasetId) {
-    const reportInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports/${reportId}`;
+async function getReports(workspaceId) {
+    const reportInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports`;
     const headers = await getRequestHeader();
 
     // Get report info by calling the PowerBI REST API
@@ -61,23 +60,67 @@ async function getEmbedParamsForSingleReport(workspaceId, reportId, additionalDa
     const resultJson = await result.json();
 
     // Add report data for embedding
-    const reportDetails = new PowerBiReportDetails(resultJson.id, resultJson.name, resultJson.embedUrl);
-    const reportEmbedConfig = new EmbedConfig();
+    const reportsDetails = [];
+    if(Array.isArray(resultJson.value)) resultJson.value.forEach( el => reportsDetails.push({
+        reportId: el.id,
+        reportName: el.name
+    }));
+    return reportsDetails;
+}
 
-    // Create mapping for report and Embed URL
-    reportEmbedConfig.reportsDetail = [reportDetails];
 
-    // Create list of datasets
-    let datasetIds = [resultJson.datasetId];
+/**
+ * Get embed params for a single report for a single workspace
+ * @param {string} workspaceId
+ * @param {string} reportId
+ * @param {string} additionalDatasetId - Optional Parameter
+ * @return EmbedConfig object
+ */
+async function getEmbedParamsForSingleReport(workspaceId, reportId, additionalDatasetId) {
+    try{
+        const reportInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports/${reportId}`;
+        const headers = await getRequestHeader();
+        console.log( reportInGroupApi )
+        console.log( headers )
+        // Get report info by calling the PowerBI REST API
+        const result = await fetch(reportInGroupApi, {
+            method: 'GET',
+            headers: headers,
+        })
 
-    // Append additional dataset to the list to achieve dynamic binding later
-    if (additionalDatasetId) {
-        datasetIds.push(additionalDatasetId);
+        if (!result.ok) {
+            throw result;
+        }
+
+        // Convert result in json to retrieve values
+        const resultJson = await result.json();
+
+        // Add report data for embedding
+        const reportDetails = new PowerBiReportDetails(resultJson.id, resultJson.name, resultJson.embedUrl);
+        const reportEmbedConfig = new EmbedConfig();
+
+        // Create mapping for report and Embed URL
+        reportEmbedConfig.reportsDetail = {
+            reportId: resultJson.id,
+            reportName: resultJson.name,
+            embedUrl: resultJson.embedUrl
+        };
+
+        // Create list of datasets
+        let datasetIds = [resultJson.datasetId];
+
+        // Append additional dataset to the list to achieve dynamic binding later
+        if (additionalDatasetId) {
+            datasetIds.push(additionalDatasetId);
+        }
+
+        // Get Embed token multiple resources
+        reportEmbedConfig.embedToken = await getEmbedTokenForSingleReportSingleWorkspace(reportId, datasetIds, workspaceId);
+        return reportEmbedConfig;
+    } catch( err ){
+        console.log(err)
+        return {}
     }
-
-    // Get Embed token multiple resources
-    reportEmbedConfig.embedToken = await getEmbedTokenForSingleReportSingleWorkspace(reportId, datasetIds, workspaceId);
-    return reportEmbedConfig;
 }
 
 /**
@@ -320,6 +363,45 @@ async function getRequestHeader() {
     };
 }
 
+/**
+ * Get Request header
+ * @return Request header with Bearer token
+ */
+async function getToken() {
+
+    // Store authentication token
+    let tokenResponse;
+
+    // Store the error thrown while getting authentication token
+    let errorResponse;
+
+    // Get the response from the authentication request
+    try {
+        tokenResponse = await auth.getAccessToken();
+    } catch (err) {
+        if (err.hasOwnProperty('error_description') && err.hasOwnProperty('error')) {
+            errorResponse = err.error_description;
+        } else {
+
+            // Invalid PowerBI Username provided
+            errorResponse = err.toString();
+        }
+        return {
+            'status': 401,
+            'error': errorResponse
+        };
+    }
+
+    // Extract AccessToken from the response
+    const token = tokenResponse.accessToken;
+    return {
+        'token': utils.getAuthHeader(token)
+    };
+}
+
 module.exports = {
-    getEmbedInfo: getEmbedInfo
+    getEmbedInfo: getEmbedInfo,
+    getToken: getToken,
+    getReports: getReports,
+    getEmbedParamsForSingleReport: getEmbedParamsForSingleReport
 }
