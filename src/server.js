@@ -7,6 +7,7 @@ const cors = require('cors')
 const bodyParser = require("body-parser");
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const config = require('../config/config.json')
 //const swaggerDocument = require('./swagger.json');
 
 const swaggerOptions = {
@@ -74,7 +75,7 @@ app.post('/getReport', async function (req, res) {
             };
         }
         // Get the details like Embed URL, Access token and Expiry
-        const result = await embedToken.getEmbedParamsForSingleReport("b5a65efe-66b0-4163-a318-c83b90d1352a", req.body.reportId);
+        const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.body.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
         console.log( result )
@@ -111,7 +112,7 @@ app.get('/getReportsByGroup', async function (req, res) {
             };
         }
         // Get the details like Embed URL, Access token and Expiry
-        let result = await embedToken.getReports("b5a65efe-66b0-4163-a318-c83b90d1352a");
+        let result = await embedToken.getReports(config.workspaceId);
 
         // result.status specified the statusCode that will be sent along with the result object
         res.status(200).send(result);
