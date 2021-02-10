@@ -6,7 +6,9 @@
     "scripts": {
         "react": "npm start --prefix newdlx",
         "dev": "concurrently --kill-others-on-fail \"npm start\" \"npm run react\"",
-        "start": "nodemon ./src/server.js"
+        "devdbg": "concurrently --kill-others-on-fail \"npm run debug\" \"npm run react\"",
+        "start": "nodemon ./src/server.js",
+        "debug" : "nodemon --inspect ./src/server.js"
     },
     "author": "alec",
     "license": "ISC",
