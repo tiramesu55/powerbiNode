@@ -55,6 +55,7 @@ export class ReportEmbedding {
     }
 
     private runEmbedding(reportConfiguration: IEmbedConfiguration, hostContainer: HTMLDivElement): void {
-        this.pbiService.embed(hostContainer, reportConfiguration);
+        const report = this.pbiService.embed(hostContainer, reportConfiguration);
+        console.log(report);
     }
 }
