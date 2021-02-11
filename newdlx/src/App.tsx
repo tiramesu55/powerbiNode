@@ -4,77 +4,67 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 //import { useTheme } from '@material-ui/core/styles';
 //import SalesReports from "./components/showReport";
-import { PowerBIEmbed } from 'powerbi-client-react';
-import { models, Report, Embed, IReportEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
-
+import { Grid, Paper } from '@material-ui/core';
 import './App.css';
-interface apiConfig {
-    accessToken: string;
-    embedUrl: any[];
-    expiry: string;
-    status: number;
+import ReportComponent from './components/ReportComponent';
+import ListReports from './components/ListReports';
+import Typography from '@material-ui/core/Typography';
+interface Report {
+    reportId: string;
+    reportName: string;
 }
 
-const layoutSettings = {
-    displayOption: models.DisplayOption.ActualSize,
-} as models.ICustomLayout;
-
-const renderSettings = {
-    layoutType: models.LayoutType.Custom,
-    customLayout: layoutSettings,
-} as IEmbedSettings;
-
 const App = (): React.ReactElement => {
-    const [report, setReport] = useState<Report>();
+    const [reports, setReports] = useState<Report[]>();
+    const [reportActive, setReportActive] = useState<Report>();
 
-    const [sampleReportConfig, setReportConfig] = useState<IReportEmbedConfiguration>({
-        type: 'report',
-        embedUrl: '',
-        tokenType: models.TokenType.Embed,
-        id: '',
-        accessToken: '',
-        settings: renderSettings,
-    });
-    // const [displayMessage, setMessage] = useState(
-    //     `The report is bootstrapped. Click the Embed Report button to set the access token`,
-    // );
-
-    //const theme = useTheme();
-    const getToken = async () =>
+    const getReports = async () =>
         axios
-            .get<apiConfig>('http://localhost:5300/getEmbedToken')
+            .get<Report[]>('http://localhost:5300/getReportsByGroup')
             .then((resp): void => {
-                const reportCon = {
-                    ...sampleReportConfig,
-                    embedUrl: resp.data.embedUrl[0].embedUrl,
-                    accessToken: resp.data.accessToken,
-                    id: resp.data.embedUrl[0].reportId,
-                };
-                setReportConfig(reportCon);
+                setReports(resp.data);
             })
             .catch((err) => console.log(err));
     useEffect(() => {
-        getToken();
-        const timerId = setInterval(() => getToken(), 1000 * 60 * 10);
-        return () => {
-            clearInterval(timerId);
-        };
+        getReports();
     }, []);
     useEffect(() => {
-        console.log('got report');
-    }, [report]);
+        console.log(reports);
+    }, [reports]);
+    const setReport = (reportId: string) => {
+        const reportActive = reports?.find((el) => el.reportId === reportId);
+        setReportActive(reportActive);
+    };
     return (
         <div>
-            {sampleReportConfig.id && (
-                <PowerBIEmbed
-                    embedConfig={sampleReportConfig}
-                    //    eventHandlers = {eventHandlersMap}
-                    cssClassName={'report-style-class'}
-                    getEmbeddedComponent={(embedObject: Embed) => {
-                        console.log(`Embedded object of type "${embedObject.embedtype}" received`);
-                        setReport(embedObject as Report);
+            {reports?.length && (
+                <Grid
+                    container
+                    direction="row"
+                    justify="flex-start"
+                    alignItems="flex-start"
+                    style={{
+                        backgroundColor: '#F0F8FF',
                     }}
-                />
+                >
+                    <Grid item xs={2}>
+                        <Paper style={{ width: '100%' }}>
+                            <ListReports reports={reports} setReport={setReport} />
+                        </Paper>
+                    </Grid>
+                    {reportActive && (
+                        <Grid item container xs={10} justify="center" alignItems="center" direction="column">
+                            <Grid item xs={12}>
+                                <Typography variant="h6" gutterBottom>
+                                    {reportActive?.reportName}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} style={{ width: '100%' }}>
+                                <ReportComponent reportId={reportActive.reportId} />
+                            </Grid>
+                        </Grid>
+                    )}
+                </Grid>
             )}
         </div>
     );
