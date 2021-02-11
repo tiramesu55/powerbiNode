@@ -21,7 +21,12 @@ const layoutSettings = {
 } as models.ICustomLayout;
 
 const renderSettings = {
-    layoutType: models.LayoutType.Custom,
+    filterPaneEnabled: false,
+    navContentPaneEnabled: false,
+    layoutType: models.LayoutType.Custom, //
+    //layoutType: showMobileLayout
+    //    ? models.LayoutType.MobilePortrait
+    //    : models.LayoutType.Custom,
     customLayout: layoutSettings,
 } as IEmbedSettings;
 //to get to div container of the embedded report
