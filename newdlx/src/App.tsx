@@ -7,14 +7,18 @@ import axios from 'axios';
 import { Grid, Paper } from '@material-ui/core';
 import './App.css';
 import ReportComponent from './components/ReportComponent';
+//import MobileReportComponent from './components/MobileReportComponent';
 import ListReports from './components/ListReports';
 import Typography from '@material-ui/core/Typography';
+
+import Hidden from '@material-ui/core/Hidden';
+import withWidth from '@material-ui/core/withWidth';
 interface Report {
     reportId: string;
     reportName: string;
 }
 
-const App = (): React.ReactElement => {
+const App = (props: any): React.ReactElement => {
     const [reports, setReports] = useState<Report[]>();
     const [reportActive, setReportActive] = useState<Report>();
 
@@ -30,6 +34,7 @@ const App = (): React.ReactElement => {
     }, []);
     useEffect(() => {
         console.log(reports);
+        console.log(props.width);
     }, [reports]);
     const setReport = (reportId: string) => {
         const reportActive = reports?.find((el) => el.reportId === reportId);
@@ -47,27 +52,37 @@ const App = (): React.ReactElement => {
                         backgroundColor: '#F0F8FF',
                     }}
                 >
-                    <Grid item xs={2}>
-                        <Paper style={{ width: '100%' }}>
-                            <ListReports reports={reports} setReport={setReport} />
-                        </Paper>
-                    </Grid>
-                    {reportActive && (
-                        <Grid item container xs={10} justify="center" alignItems="center" direction="column">
-                            <Grid item xs={12}>
-                                <Typography variant="h6" gutterBottom>
-                                    {reportActive?.reportName}
-                                </Typography>
+                    <Hidden xsDown>
+                        <Grid item xs={2}>
+                            <Paper style={{ width: '100%' }}>
+                                <ListReports reports={reports} setReport={setReport} />
+                            </Paper>
+                        </Grid>
+
+                        {reportActive && (
+                            <Grid item container xs={10} justify="center" alignItems="center" direction="column">
+                                <Grid item xs={12}>
+                                    <Typography variant="h6" gutterBottom>
+                                        {reportActive?.reportName}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} style={{ width: '100%' }}>
+                                    <ReportComponent reportId={reportActive.reportId} />
+                                </Grid>
                             </Grid>
+                        )}
+                    </Hidden>
+                    {/* <Hidden xsUp>
+                        <Grid item container xs={12} justify="center" alignItems="center">
                             <Grid item xs={12} style={{ width: '100%' }}>
-                                <ReportComponent reportId={reportActive.reportId} />
+                                <MobileReportComponent reportId={'736dadd3-e55c-4680-a330-7b3feaa7a233'} />
                             </Grid>
                         </Grid>
-                    )}
+                    </Hidden> */}
                 </Grid>
             )}
         </div>
     );
 };
 
-export default App;
+export default withWidth()(App);

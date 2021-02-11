@@ -26,7 +26,7 @@ const layoutSettings = {
 const reportContainer = React.createRef<HTMLDivElement>();
 let reportContainerHtml: HTMLDivElement;
 
-export default function ReportComponent(props: IReportProps) {
+export default function MobileReportComponent(props: IReportProps) {
     // const theme = useTheme();
     // const isMobileViewport = useMediaQuery(theme.breakpoints.down('xs'), {
     //     noSsr: true,
@@ -34,8 +34,8 @@ export default function ReportComponent(props: IReportProps) {
     const renderSettings = {
         filterPaneEnabled: false,
         navContentPaneEnabled: false,
-        layoutType: models.LayoutType.Custom, //
-        //layoutType: isMobileViewport ? models.LayoutType.MobilePortrait : models.LayoutType.Custom,
+        //    layoutType: models.LayoutType.Custom, //
+        layoutType: models.LayoutType.MobilePortrait,
         customLayout: layoutSettings,
     } as IEmbedSettings;
     const [timer, setTimer] = React.useState<NodeJS.Timeout | undefined>();
@@ -61,6 +61,7 @@ export default function ReportComponent(props: IReportProps) {
                     accessToken: resp.data.accessToken,
                     id: resp.data.reportId,
                 };
+                console.log(reportCon);
                 setReportConfig(reportCon);
             })
             .catch((err) => console.log(err));
@@ -75,6 +76,14 @@ export default function ReportComponent(props: IReportProps) {
         };
     }, [props.reportId]);
 
+    React.useEffect(() => {
+        console.log('got report');
+        getReport();
+        setTimer(setInterval(() => getReport(), 1000 * 60 * 10));
+        return () => {
+            timer && clearInterval(timer);
+        };
+    }, []);
     function setContainerHeight(report: Report, hostContainer: HTMLDivElement): void {
         report &&
             report.getPages().then((p: Array<Page>) => {
@@ -83,7 +92,7 @@ export default function ReportComponent(props: IReportProps) {
                 if (reportWidth! > 0) {
                     const ratio = reportHeight! / reportWidth!;
                     const containerWidth = hostContainer.clientWidth;
-                    const newContainerHeight = Math.round(containerWidth * ratio) + 10;
+                    const newContainerHeight = Math.round(containerWidth * ratio) + 110;
                     console.log(newContainerHeight);
                     hostContainer.style.height = `${newContainerHeight}px`;
                 }
