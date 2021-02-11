@@ -12,13 +12,12 @@ import ListReports from './components/ListReports';
 import Typography from '@material-ui/core/Typography';
 
 import Hidden from '@material-ui/core/Hidden';
-import withWidth from '@material-ui/core/withWidth';
 interface Report {
     reportId: string;
     reportName: string;
 }
 
-const App = (props: any): React.ReactElement => {
+const App = (): React.ReactElement => {
     const [reports, setReports] = useState<Report[]>();
     const [reportActive, setReportActive] = useState<Report>();
 
@@ -32,10 +31,10 @@ const App = (props: any): React.ReactElement => {
     useEffect(() => {
         getReports();
     }, []);
-    useEffect(() => {
-        console.log(reports);
-        console.log(props.width);
-    }, [reports]);
+    // useEffect(() => {
+    //     // console.log(reports);
+    //     console.log(props.width);
+    // }, [props.width]);
     const setReport = (reportId: string) => {
         const reportActive = reports?.find((el) => el.reportId === reportId);
         setReportActive(reportActive);
@@ -58,20 +57,19 @@ const App = (props: any): React.ReactElement => {
                                 <ListReports reports={reports} setReport={setReport} />
                             </Paper>
                         </Grid>
-
-                        {reportActive && (
-                            <Grid item container xs={10} justify="center" alignItems="center" direction="column">
-                                <Grid item xs={12}>
-                                    <Typography variant="h6" gutterBottom>
-                                        {reportActive?.reportName}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12} style={{ width: '100%' }}>
-                                    <ReportComponent reportId={reportActive.reportId} />
-                                </Grid>
-                            </Grid>
-                        )}
                     </Hidden>
+                    {reportActive && (
+                        <Grid item container xs={10} justify="center" alignItems="center" direction="column">
+                            <Grid item xs={12}>
+                                <Typography variant="h6" gutterBottom>
+                                    {reportActive?.reportName}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} style={{ width: '100%' }}>
+                                <ReportComponent reportId={reportActive.reportId} />
+                            </Grid>
+                        </Grid>
+                    )}
                     {/* <Hidden xsUp>
                         <Grid item container xs={12} justify="center" alignItems="center">
                             <Grid item xs={12} style={{ width: '100%' }}>
@@ -85,4 +83,4 @@ const App = (props: any): React.ReactElement => {
     );
 };
 
-export default withWidth()(App);
+export default App;

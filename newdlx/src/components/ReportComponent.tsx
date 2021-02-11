@@ -7,8 +7,11 @@ import axios from 'axios';
 // import { useMediaQuery } from '@material-ui/core';
 // import { useTheme } from '@material-ui/core/styles';
 
+import withWidth from '@material-ui/core/withWidth';
+
 interface IReportProps {
     reportId: string;
+    width: string;
 }
 interface apiConfig {
     accessToken: string;
@@ -26,7 +29,7 @@ const layoutSettings = {
 const reportContainer = React.createRef<HTMLDivElement>();
 let reportContainerHtml: HTMLDivElement;
 
-export default function ReportComponent(props: IReportProps) {
+function ReportComponent(props: IReportProps) {
     // const theme = useTheme();
     // const isMobileViewport = useMediaQuery(theme.breakpoints.down('xs'), {
     //     noSsr: true,
@@ -39,7 +42,7 @@ export default function ReportComponent(props: IReportProps) {
         customLayout: layoutSettings,
     } as IEmbedSettings;
     const [timer, setTimer] = React.useState<NodeJS.Timeout | undefined>();
-    //const [report, setReport] = React.useState<Report | undefined>();
+    const [report2, setReport] = React.useState<Report | undefined>();
 
     const [sampleReportConfig, setReportConfig] = React.useState<IReportEmbedConfiguration>({
         type: 'report',
@@ -74,7 +77,13 @@ export default function ReportComponent(props: IReportProps) {
             timer && clearInterval(timer);
         };
     }, [props.reportId]);
-
+    React.useEffect(() => {
+        // console.log(reports);
+        console.log(props.width);
+        reportContainerHtml = reportContainer.current!;
+        console.log(reportContainerHtml);
+        setContainerHeight(report2!, reportContainerHtml);
+    }, [props.width]);
     function setContainerHeight(report: Report, hostContainer: HTMLDivElement): void {
         report &&
             report.getPages().then((p: Array<Page>) => {
@@ -83,7 +92,7 @@ export default function ReportComponent(props: IReportProps) {
                 if (reportWidth! > 0) {
                     const ratio = reportHeight! / reportWidth!;
                     const containerWidth = hostContainer.clientWidth;
-                    const newContainerHeight = Math.round(containerWidth * ratio) + 10;
+                    const newContainerHeight = Math.round(containerWidth * ratio) + 5;
                     console.log(newContainerHeight);
                     hostContainer.style.height = `${newContainerHeight}px`;
                 }
@@ -99,7 +108,7 @@ export default function ReportComponent(props: IReportProps) {
                     getEmbeddedComponent={(embedObject: Embed) => {
                         console.log(`Embedded object of type "${embedObject.embedtype}" received`);
                         report = embedObject as Report;
-                        //setReport(embedObject as Report);
+                        setReport(embedObject as Report);
                     }}
                     eventHandlers={
                         new Map([
@@ -134,3 +143,4 @@ export default function ReportComponent(props: IReportProps) {
         </div>
     );
 }
+export default withWidth()(ReportComponent);
