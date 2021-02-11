@@ -35,7 +35,11 @@ export default function SimpleList(props: any) {
             <List component="nav" aria-label="secondary mailbox folders">
                 {props.reports.map((el: any) => (
                     <ListItem button>
-                        <ListItemText primary={el.reportName} onClick={() => props.setReport(el.reportId)} />
+                        <ListItemText
+                            key={el.reportId}
+                            primary={el.reportName}
+                            onClick={() => props.setReport(el.reportId)}
+                        />
                     </ListItem>
                 ))}
             </List>
