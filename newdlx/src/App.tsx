@@ -6,11 +6,11 @@ import axios from 'axios';
 //import SalesReports from "./components/showReport";
 import { Grid, Paper } from '@material-ui/core';
 import './App.css';
-import ReportComponent from './components/ReportComponent';
+//import ReportComponent from './components/ReportComponent';
 //import MobileReportComponent from './components/MobileReportComponent';
 import ListReports from './components/ListReports';
 import Typography from '@material-ui/core/Typography';
-
+import ReportBiClientComponent from './components/ReportBiClientComponent';
 import Hidden from '@material-ui/core/Hidden';
 interface Report {
     reportId: string;
@@ -66,7 +66,8 @@ const App = (): React.ReactElement => {
                                 </Typography>
                             </Grid>
                             <Grid item xs={12} style={{ width: '100%' }}>
-                                <ReportComponent reportId={reportActive.reportId} />
+                                {/* <ReportComponent reportId={reportActive.reportId} /> */}
+                                <ReportBiClientComponent reportId={reportActive.reportId} />
                             </Grid>
                         </Grid>
                     )}

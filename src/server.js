@@ -80,10 +80,9 @@ app.post('/getReport', async function (req, res) {
         // result.status specified the statusCode that will be sent along with the result object
         console.log( result )
         res.status(200).send({
-            ...result.reportsDetail,
-            accessToken: result.embedToken.token,
-            expiry: result.embedToken.expiration,
-            status: 200
+            id: req.body.reportId,
+            embedUrl: result.reportsDetail.embedUrl,
+            accessToken: result.embedToken.token
         });
     } catch(err) {
         res.status(502).send({
