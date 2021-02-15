@@ -3,3 +3,4 @@ newdlx/.eslintcache
 yarn.lock
 package-lock.json
 logs/access.log
+logs/app.log

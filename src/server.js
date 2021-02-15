@@ -9,7 +9,8 @@ const bodyParser = require("body-parser");
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const config = require('../config/config.json')
-var morgan = require('morgan')
+const httpLogger = require('./httpLogger')
+const logger = require('./logger')
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -36,9 +37,7 @@ app.use('/css', express.static('./node_modules/bootstrap/dist/css/')); // Redire
 app.use('/public', express.static('./public/')); // Use custom JS and CSS files
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(morgan('common', {
-    stream: fs.createWriteStream(path.join(`./logs`, 'access.log'), { flags: 'a' })
-}))
+app.use(httpLogger)
   
 const port = process.env.PORT || 5300;
 
@@ -70,6 +69,7 @@ app.post('/getReport', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -85,6 +85,7 @@ app.post('/getReport', async function (req, res) {
             accessToken: result.embedToken.token
         });
     } catch(err) {
+        logger.error('This broke with error: ', err)
         res.status(502).send({
             error: err.toString()
         })
@@ -105,6 +106,7 @@ app.get('/getReportsByGroup', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -116,7 +118,8 @@ app.get('/getReportsByGroup', async function (req, res) {
         // result.status specified the statusCode that will be sent along with the result object
         res.status(200).send(result);
     } catch(err) {
-        console.log(err)
+        logger.error('This broke with error: ', err)
+        res.status(500).send('Error!')
     }
 });
 /**
@@ -134,6 +137,7 @@ app.get('/getToken', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -145,7 +149,8 @@ app.get('/getToken', async function (req, res) {
         // result.status specified the statusCode that will be sent along with the result object
         res.status(200).send(result);
     } catch(err) {
-        console.log(err)
+        logger.error('This broke with error: ', err)
+        res.status(500).send('Error!')
     }
 });
 
