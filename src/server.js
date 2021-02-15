@@ -1,5 +1,6 @@
 
 let path = require('path');
+var fs = require('fs')
 let embedToken = require('./embedConfigService.js');
 const utils = require("./utils.js");
 const express = require("express");
@@ -8,7 +9,7 @@ const bodyParser = require("body-parser");
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const config = require('../config/config.json')
-//const swaggerDocument = require('./swagger.json');
+var morgan = require('morgan')
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -35,6 +36,10 @@ app.use('/css', express.static('./node_modules/bootstrap/dist/css/')); // Redire
 app.use('/public', express.static('./public/')); // Use custom JS and CSS files
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.use(morgan('common', {
+    stream: fs.createWriteStream(path.join(`./logs`, 'access.log'), { flags: 'a' })
+}))
+  
 const port = process.env.PORT || 5300;
 
 app.use(bodyParser.json());
@@ -43,10 +48,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-// //test for connection react 
-// app.get('/test', (req,res) =>{
-//     res.send({ express: 'Test from Express' });
-// } );
 /**
  * @swagger
  *
@@ -78,7 +79,6 @@ app.post('/getReport', async function (req, res) {
         const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.body.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
-        console.log( result )
         res.status(200).send({
             id: req.body.reportId,
             embedUrl: result.reportsDetail.embedUrl,
@@ -149,5 +149,4 @@ app.get('/getToken', async function (req, res) {
     }
 });
 
-//app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -80,8 +80,7 @@ async function getEmbedParamsForSingleReport(workspaceId, reportId, additionalDa
     try{
         const reportInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports/${reportId}`;
         const headers = await getRequestHeader();
-        console.log( reportInGroupApi )
-        console.log( headers )
+
         // Get report info by calling the PowerBI REST API
         const result = await fetch(reportInGroupApi, {
             method: 'GET',

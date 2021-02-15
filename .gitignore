@@ -2,3 +2,4 @@ node_modules
 newdlx/.eslintcache
 yarn.lock
 package-lock.json
+logs/access.log

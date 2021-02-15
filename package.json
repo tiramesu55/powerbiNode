@@ -8,7 +8,7 @@
         "dev": "concurrently --kill-others-on-fail \"npm start\" \"npm run react\"",
         "devdbg": "concurrently --kill-others-on-fail \"npm run debug\" \"npm run react\"",
         "start": "nodemon ./src/server.js",
-        "debug" : "nodemon --inspect ./src/server.js"
+        "debug": "nodemon --inspect ./src/server.js"
     },
     "author": "alec",
     "license": "ISC",
@@ -20,7 +20,9 @@
         "express": "^4.17.1",
         "guid": "0.0.12",
         "jquery": "^3.5.1",
+        "morgan": "^1.10.0",
         "node-fetch": "^2.6.1",
+        "node-uuid": "^1.4.8",
         "path": "^0.12.7",
         "powerbi-client": "^2.16.5",
         "swagger-jsdoc": "^6.0.2",
