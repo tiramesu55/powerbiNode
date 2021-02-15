@@ -1,5 +1,6 @@
 
 let path = require('path');
+var fs = require('fs')
 let embedToken = require('./embedConfigService.js');
 const utils = require("./utils.js");
 const express = require("express");
@@ -8,7 +9,8 @@ const bodyParser = require("body-parser");
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const config = require('../config/config.json')
-//const swaggerDocument = require('./swagger.json');
+const httpLogger = require('./httpLogger')
+const logger = require('./logger')
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -35,6 +37,8 @@ app.use('/css', express.static('./node_modules/bootstrap/dist/css/')); // Redire
 app.use('/public', express.static('./public/')); // Use custom JS and CSS files
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.use(httpLogger)
+  
 const port = process.env.PORT || 5300;
 
 app.use(bodyParser.json());
@@ -43,10 +47,6 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-// //test for connection react 
-// app.get('/test', (req,res) =>{
-//     res.send({ express: 'Test from Express' });
-// } );
 /**
  * @swagger
  *
@@ -69,6 +69,7 @@ app.post('/getReport', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -78,13 +79,13 @@ app.post('/getReport', async function (req, res) {
         const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.body.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
-        console.log( result )
         res.status(200).send({
             id: req.body.reportId,
             embedUrl: result.reportsDetail.embedUrl,
             accessToken: result.embedToken.token
         });
     } catch(err) {
+        logger.error('This broke with error: ', err)
         res.status(502).send({
             error: err.toString()
         })
@@ -105,6 +106,7 @@ app.get('/getReportsByGroup', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -116,7 +118,8 @@ app.get('/getReportsByGroup', async function (req, res) {
         // result.status specified the statusCode that will be sent along with the result object
         res.status(200).send(result);
     } catch(err) {
-        console.log(err)
+        logger.error('This broke with error: ', err)
+        res.status(500).send('Error!')
     }
 });
 /**
@@ -134,6 +137,7 @@ app.get('/getToken', async function (req, res) {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
         if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
             return {
                 "status": 400,
                 "error": configCheckResult
@@ -145,9 +149,9 @@ app.get('/getToken', async function (req, res) {
         // result.status specified the statusCode that will be sent along with the result object
         res.status(200).send(result);
     } catch(err) {
-        console.log(err)
+        logger.error('This broke with error: ', err)
+        res.status(500).send('Error!')
     }
 });
 
-//app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port, () => console.log(`Listening on port ${port}`));
