@@ -28,12 +28,14 @@ export default class ReportEmbedding {
     }
 
     public embedReport(reportId: string, hostContainer: HTMLDivElement, showMobileLayout: boolean): void {
+        this.instAI.trackEvent({ name: 'embed' });
         this.getReportEmbedModel(reportId)
             .then((apiResponse) => this.getReportEmbedModelFromResponse(apiResponse))
             .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout))
-            .then((reportConfiguration) =>
-                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout),
-            );
+            .then((reportConfiguration) => {
+                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout);
+                this.instAI.stopTrackEvent('embed');
+            });
     }
 
     private getReportEmbedModel(reportId: string): Promise<Response> {
