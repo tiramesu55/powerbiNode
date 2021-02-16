@@ -1,6 +1,6 @@
 
 let path = require('path');
-var fs = require('fs')
+const fs = require('fs')
 let embedToken = require('./embedConfigService.js');
 const utils = require("./utils.js");
 const express = require("express");
@@ -11,6 +11,14 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const config = require('../config/config.json')
 const httpLogger = require('./httpLogger')
 const logger = require('./logger')
+const appInsights = require('applicationinsights');
+
+appInsights.setup('56ef7020-f083-4c06-af79-824503358d56')
+.setAutoCollectExceptions(true)
+.setAutoCollectPerformance(true)
+.setAutoCollectRequests(true)
+.setSendLiveMetrics(true)
+.start();
 
 const swaggerOptions = {
     swaggerDefinition: {
