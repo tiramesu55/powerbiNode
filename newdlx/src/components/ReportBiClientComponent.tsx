@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React, { useEffect } from 'react';
-import { useTheme, makeStyles } from '@material-ui/core/styles';
+import { useTheme, makeStyles, Theme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import ReportEmbedding from '../PowerBi/ReportEmbeddingClass';
-
+import ReportFilters from './ReportFilters';
+import { IFilterConfiguration } from '../PowerBi/FilterBuilder';
+import * as pbi from 'powerbi-client';
 export interface IReportProps {
     reportId: string;
+    filterConfiguration2: IFilterConfiguration;
+    theme: Theme;
 }
 
 function ReportBiClientComponent(props: IReportProps) {
@@ -16,6 +20,22 @@ function ReportBiClientComponent(props: IReportProps) {
     const useStyles = makeStyles(() => ({
         container: {
             height: isMobileViewport ? 'calc(100vh - 140px)' : '100%',
+        },
+        reportWrapper: {
+            minHeight: '200px',
+            backgroundImage: "url('/images/globomantics_loader.png')",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: '50% 50%',
+            backgroundSize: '200px 200px',
+        },
+        button: {
+            margin: theme.spacing(1),
+        },
+        reportOptionsContainer: {
+            borderBottom: '1px solid #eaeaea',
+            marginBottom: '10px',
+            display: 'inline-block',
+            width: '100%',
         },
     }));
 
@@ -36,7 +56,25 @@ function ReportBiClientComponent(props: IReportProps) {
             reportContainer.current &&
             embeding(props.reportId, reportContainer.current, isMobileViewport);
     }, [props.reportId]);
+    // Report Filters
+    function filterCallback(filters: Array<pbi.models.IFilter>): void {
+        reportEmbedding.applyReportFilters(filters, reportContainer?.current);
+    }
+    const reportFilters = (
+        <ReportFilters
+            applyFilterCallback={filterCallback}
+            filterConfiguration={props.filterConfiguration2}
+            {...props}
+        />
+    );
 
-    return <div ref={reportContainer} className={classes.container} />;
+    return (
+        <div>
+            <div className={classes.reportOptionsContainer}>{reportFilters}</div>
+            <div className={classes.reportWrapper}>
+                <div ref={reportContainer} className={classes.container} />
+            </div>
+        </div>
+    );
 }
 export default ReportBiClientComponent;

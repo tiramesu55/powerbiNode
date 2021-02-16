@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as pbi from 'powerbi-client';
 import { IEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
 import * as models from 'powerbi-models';
@@ -18,7 +20,12 @@ export default class ReportEmbedding {
             pbi.factories.routerFactory,
         );
     }
-
+    public applyReportFilters(filters: Array<pbi.models.IFilter>, hostContainer: any): void {
+        const report = this.pbiService.get(hostContainer) as pbi.Report;
+        report.setFilters(filters).catch((error) => {
+            console.log('Error applying filter', error);
+        });
+    }
     public resetElem(hostContainer: HTMLDivElement): void {
         this.pbiService.reset(hostContainer);
     }

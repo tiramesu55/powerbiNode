@@ -12,7 +12,8 @@ import ResponsiveDrawer from './components/ResponseDrawer';
 //import Typography from '@material-ui/core/Typography';
 import ReportBiClientComponent from './components/ReportBiClientComponent';
 
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { IFilterConfiguration } from './PowerBi/FilterBuilder';
+import { makeStyles, Theme, createStyles, useTheme } from '@material-ui/core/styles';
 //import Hidden from '@material-ui/core/Hidden';
 interface Report {
     reportId: string;
@@ -56,12 +57,21 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+const filterConfig = {
+    title: 'Filter Orders:',
+    filterOrderId: true,
+    filterLocations: true,
+    filterOrderDates: true,
+    filterTotalSales: true,
+    filterProductCode: true,
+} as IFilterConfiguration;
+
 const App = (): React.ReactElement => {
     const [reports, setReports] = useState<Report[]>();
     const [reportActive, setReportActive] = useState<Report>();
 
     const classes = useStyles();
-
+    const theme = useTheme();
     const getReports = async () =>
         axios
             .get<Report[]>('http://localhost:5300/getReportsByGroup')
@@ -89,7 +99,11 @@ const App = (): React.ReactElement => {
                         <main className={classes.content}>
                             <div className={classes.toolbar} />
                             {/* <ReportComponent reportId={reportActive.reportId} /> */}
-                            <ReportBiClientComponent reportId={reportActive.reportId} />
+                            <ReportBiClientComponent
+                                reportId={reportActive.reportId}
+                                filterConfiguration2={filterConfig}
+                                theme={theme}
+                            />
                         </main>
                     )}
                 </>
