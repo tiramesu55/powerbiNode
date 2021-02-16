@@ -1,7 +1,7 @@
 import * as pbi from 'powerbi-client';
 import { IEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
 import * as models from 'powerbi-models';
-
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 interface IReportEmbedModel {
     id: string;
     embedUrl: string;
@@ -10,13 +10,17 @@ interface IReportEmbedModel {
 
 export default class ReportEmbedding {
     private pbiService: pbi.service.Service;
-
+    private instAI: ApplicationInsights;
     constructor() {
         this.pbiService = new pbi.service.Service(
             pbi.factories.hpmFactory,
             pbi.factories.wpmpFactory,
             pbi.factories.routerFactory,
         );
+        this.instAI = new ApplicationInsights({
+            config: { instrumentationKey: '56ef7020-f083-4c06-af79-824503358d56' },
+        });
+        this.instAI.loadAppInsights();
     }
 
     public resetElem(hostContainer: HTMLDivElement): void {
