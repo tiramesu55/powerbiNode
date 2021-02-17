@@ -11,7 +11,8 @@ import './App.css';
 import ResponsiveDrawer from './components/ResponseDrawer';
 //import Typography from '@material-ui/core/Typography';
 import ReportBiClientComponent from './components/ReportBiClientComponent';
-
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin, appInsights } from './Azure/AppInsights';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 //import Hidden from '@material-ui/core/Hidden';
 interface Report {
@@ -80,6 +81,7 @@ const App = (): React.ReactElement => {
         const reportActive = reports?.find((el) => el.reportId === reportId);
         setReportActive(reportActive);
     };
+
     return (
         <div className={classes.root}>
             {reports?.length && (
@@ -89,7 +91,7 @@ const App = (): React.ReactElement => {
                         <main className={classes.content}>
                             <div className={classes.toolbar} />
                             {/* <ReportComponent reportId={reportActive.reportId} /> */}
-                            <ReportBiClientComponent reportId={reportActive.reportId} />
+                            <ReportBiClientComponent reportId={reportActive.reportId} appInsights={appInsights} />
                         </main>
                     )}
                 </>
@@ -98,4 +100,4 @@ const App = (): React.ReactElement => {
     );
 };
 
-export default App;
+export default withAITracking(reactPlugin, App);

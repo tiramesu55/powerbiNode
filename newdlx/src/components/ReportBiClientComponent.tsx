@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React, { useEffect } from 'react';
@@ -7,12 +8,12 @@ import ReportEmbedding from '../PowerBi/ReportEmbeddingClass';
 
 export interface IReportProps {
     reportId: string;
+    appInsights: any;
 }
 
 function ReportBiClientComponent(props: IReportProps) {
     const reportContainer = React.createRef<HTMLDivElement>();
-    const reportEmbedding = new ReportEmbedding();
-
+    const reportEmbedding = new ReportEmbedding(props.appInsights);
     const useStyles = makeStyles(() => ({
         container: {
             height: isMobileViewport ? 'calc(100vh - 140px)' : '100%',

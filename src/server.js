@@ -87,6 +87,7 @@ app.post('/getReport', async function (req, res) {
         const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.body.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
+     //   res.status(500).send("Error");
         res.status(200).send({
             id: req.body.reportId,
             embedUrl: result.reportsDetail.embedUrl,

@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as pbi from 'powerbi-client';
 import { IEmbedConfiguration, IEmbedSettings } from 'powerbi-client';
 import * as models from 'powerbi-models';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { ApplicationInsights, SeverityLevel } from '@microsoft/applicationinsights-web';
 interface IReportEmbedModel {
     id: string;
     embedUrl: string;
@@ -11,16 +13,13 @@ interface IReportEmbedModel {
 export default class ReportEmbedding {
     private pbiService: pbi.service.Service;
     private instAI: ApplicationInsights;
-    constructor() {
+    constructor(appInsights: any) {
         this.pbiService = new pbi.service.Service(
             pbi.factories.hpmFactory,
             pbi.factories.wpmpFactory,
             pbi.factories.routerFactory,
         );
-        this.instAI = new ApplicationInsights({
-            config: { instrumentationKey: '56ef7020-f083-4c06-af79-824503358d56' },
-        });
-        this.instAI.loadAppInsights();
+        this.instAI = appInsights;
     }
 
     public resetElem(hostContainer: HTMLDivElement): void {
@@ -29,12 +28,18 @@ export default class ReportEmbedding {
 
     public embedReport(reportId: string, hostContainer: HTMLDivElement, showMobileLayout: boolean): void {
         this.instAI.trackEvent({ name: 'embed' });
+        //   this.instAI.trackException({ error: new Error('Error'), severityLevel: SeverityLevel.Error });
         this.getReportEmbedModel(reportId)
             .then((apiResponse) => this.getReportEmbedModelFromResponse(apiResponse))
             .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout))
             .then((reportConfiguration) => {
                 this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout);
                 this.instAI.stopTrackEvent('embed');
+                // this.instAI.trackTrace({ message: 'done', severityLevel: SeverityLevel.Information });
+            })
+            .catch((err) => {
+                console.log(err);
+                this.instAI.trackException({ error: new Error(err.toString()), severityLevel: SeverityLevel.Error });
             });
     }
 
