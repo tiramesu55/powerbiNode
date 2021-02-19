@@ -27,14 +27,19 @@ export default class ReportEmbedding {
     }
 
     public embedReport(reportId: string, hostContainer: HTMLDivElement, showMobileLayout: boolean): void {
-        this.instAI.trackEvent({ name: 'embed' });
+        //this.instAI.trackEvent({ name: 'embed start', properties: { id: 'slava', time: new Date().getTime() } });
         //   this.instAI.trackException({ error: new Error('Error'), severityLevel: SeverityLevel.Error });
+        const start = new Date().getTime();
         this.getReportEmbedModel(reportId)
             .then((apiResponse) => this.getReportEmbedModelFromResponse(apiResponse))
             .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout))
             .then((reportConfiguration) => {
                 this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout);
-                this.instAI.stopTrackEvent('embed');
+
+                this.instAI.trackEvent({
+                    name: `embed report ${reportId}`,
+                    properties: { reportTime: new Date().getTime() - start },
+                });
                 // this.instAI.trackTrace({ message: 'done', severityLevel: SeverityLevel.Information });
             })
             .catch((err) => {
