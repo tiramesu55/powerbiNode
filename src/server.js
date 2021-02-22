@@ -59,7 +59,7 @@ app.use(bodyParser.urlencoded({
  * @swagger
  *
  * /getReport:
- *   post:
+ *   get:
  *     summary: Get report by id
  *     produces:
  *       - application/json
@@ -72,7 +72,7 @@ app.use(bodyParser.urlencoded({
  *       '200': 
  *          description: A successful response
  */
-app.post('/getReport', async function (req, res) {
+app.get('/getReport/:reportId', async function (req, res) {
     try {
         // Validate whether all the required configurations are provided in config.json
         configCheckResult = utils.validateConfig();
@@ -84,12 +84,13 @@ app.post('/getReport', async function (req, res) {
             };
         }
         // Get the details like Embed URL, Access token and Expiry
-        const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.body.reportId);
+        console.log( req.params.reportId )
+        const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.params.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
      //   res.status(500).send("Error");
         res.status(200).send({
-            id: req.body.reportId,
+            id: req.params.reportId,
             embedUrl: result.reportsDetail.embedUrl,
             accessToken: result.embedToken.token
         });
