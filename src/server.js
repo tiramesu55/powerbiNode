@@ -58,16 +58,16 @@ app.use(bodyParser.urlencoded({
 /**
  * @swagger
  *
- * /getReport:
+ * /getReport/{reportId}:
  *   get:
  *     summary: Get report by id
- *     produces:
- *       - application/json
  *     parameters:
- *       - name: reportId
- *         in: formData
+ *       - in: path
+ *         name: reportId
  *         required: true
- *         type: string
+ *         description: String ID of the report.
+ *         schema:
+ *           type: string
  *     responses: 
  *       '200': 
  *          description: A successful response
@@ -84,7 +84,6 @@ app.get('/getReport/:reportId', async function (req, res) {
             };
         }
         // Get the details like Embed URL, Access token and Expiry
-        console.log( req.params.reportId )
         const result = await embedToken.getEmbedParamsForSingleReport(config.workspaceId, req.params.reportId);
 
         // result.status specified the statusCode that will be sent along with the result object
