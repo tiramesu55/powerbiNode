@@ -7,6 +7,7 @@ import ReportEmbedding from '../PowerBi/ReportEmbeddingClass';
 import ReportFilters from './ReportFilters';
 import { IFilterConfiguration } from '../PowerBi/FilterBuilder';
 import * as pbi from 'powerbi-client';
+
 export interface IReportProps {
     reportId: string;
     filterConfiguration2: IFilterConfiguration;
@@ -20,13 +21,14 @@ function ReportBiClientComponent(props: IReportProps) {
     const useStyles = makeStyles(() => ({
         container: {
             height: isMobileViewport ? 'calc(100vh - 140px)' : '100%',
+            visibility: 'hidden',
         },
         reportWrapper: {
-            minHeight: '200px',
-            backgroundImage: "url('/images/globomantics_loader.png')",
+            minHeight: '90vh',
+            backgroundImage: 'url(/images/loading.gif)',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: '50% 50%',
-            backgroundSize: '200px 200px',
+            backgroundSize: '40px 8px',
         },
         button: {
             margin: theme.spacing(1),
@@ -48,13 +50,13 @@ function ReportBiClientComponent(props: IReportProps) {
 
     const embeding = (reportId: string, reportContainer: HTMLDivElement, isMobileViewport: boolean): void => {
         reportEmbedding.resetElem(reportContainer);
+        reportContainer.style.visibility = 'hidden';
+        console.log(reportContainer);
         reportEmbedding.embedReport(reportId, reportContainer, isMobileViewport);
     };
 
     useEffect(() => {
-        reportContainer &&
-            reportContainer.current &&
-            embeding(props.reportId, reportContainer.current, isMobileViewport);
+        reportContainer?.current && embeding(props.reportId, reportContainer.current, isMobileViewport);
     }, [props.reportId]);
     // Report Filters
     function filterCallback(filters: Array<pbi.models.IFilter>): void {
@@ -71,8 +73,8 @@ function ReportBiClientComponent(props: IReportProps) {
     return (
         <div>
             <div className={classes.reportOptionsContainer}>{reportFilters}</div>
-            <div className={classes.reportWrapper}>
-                <div ref={reportContainer} className={classes.container} />
+            <div id="reportWrapp" className={classes.reportWrapper}>
+                <div id="container" ref={reportContainer} className={classes.container} />
             </div>
         </div>
     );

@@ -89,12 +89,23 @@ export default class ReportEmbedding {
         reportName: string,
         showMobileLayout: boolean,
     ): void {
+        debugger;
         const report = this.pbiService.embed(hostContainer, reportConfiguration) as pbi.Report;
 
         report.off('loaded');
+        report.off('error');
+
         report.on('loaded', () => {
             this.handleTokenExpiration(report, reportName);
-            this.setContainerHeight(report, hostContainer, showMobileLayout);
+            this.setContainerHeight(report, hostContainer, showMobileLayout).then(() => this.showReport(hostContainer));
+        });
+
+        report.on('error', (e) => {
+            const error = e.detail as models.IError;
+            if (error.level! > models.TraceType.Error) {
+                console.log('Embedded Error: ', error);
+            }
+            //need to remove tell react to stop progress indicator which is animated gif
         });
     }
 
@@ -112,7 +123,7 @@ export default class ReportEmbedding {
     }
 
     private setContainerHeight(report: pbi.Report, hostContainer: HTMLDivElement, showMobileLayout: boolean) {
-        report.getPages().then((p: Array<pbi.Page>) => {
+        return report.getPages().then((p: Array<pbi.Page>) => {
             p[0].hasLayout(models.LayoutType.MobilePortrait).then((hasMobileLayout) => {
                 if (!hasMobileLayout || !showMobileLayout) {
                     const reportHeight = p[0].defaultSize.height ? p[0].defaultSize.height : 0;
@@ -126,5 +137,11 @@ export default class ReportEmbedding {
                 }
             });
         });
+    }
+    private showReport(hostContainer: HTMLDivElement): void {
+        window.setTimeout(() => {
+            console.log(hostContainer);
+            hostContainer.style.visibility = 'visible';
+        }, 300);
     }
 }
