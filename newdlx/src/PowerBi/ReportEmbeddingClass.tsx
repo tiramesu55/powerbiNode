@@ -49,12 +49,11 @@ export default class ReportEmbedding {
     }
 
     private getReportEmbedModel(reportId: string): Promise<Response> {
-        const request = new Request('http://localhost:5300/getReport', {
+        const request = new Request(`http://localhost:5300/getReport/${reportId}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
-            method: 'POST',
-            body: JSON.stringify({ reportId: reportId }),
+            method: 'GET',
         });
 
         return fetch(request);
