@@ -190,7 +190,8 @@ async function getEmbedTokenForSingleReportSingleWorkspace(reportId, datasetIds,
     // Add report id in the request
     let formData = {
         'reports': [{
-            'id': reportId
+            'id': reportId,
+            "allowEdit": true,
         }]
     };
 

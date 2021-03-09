@@ -1,0 +1,59 @@
+/* eslint-disable react/prop-types */
+import React, { createContext, useReducer, Dispatch } from 'react';
+import { reportReducer, ReportActions } from './reducers';
+
+const ColumnsNumber = {
+    One: 1,
+    Two: 2,
+    Three: 3,
+};
+
+type Visuals = {
+    name: string;
+    title: string;
+    checked: boolean;
+};
+
+type InitialStateType = {
+    columnActive: number;
+    visuals: Visuals[];
+    // layoutReport: any;
+    // layoutPageName: any;
+    margin: number;
+    minPageWidth: number;
+};
+
+const initialState = {
+    columnActive: ColumnsNumber.Three,
+    visuals: [
+        {
+            name: '',
+            title: '',
+            checked: false,
+        },
+    ],
+    // layoutReport: null,
+    // layoutPageName: null,
+    margin: 15,
+    minPageWidth: 270,
+};
+
+const AppContext = createContext<{
+    state: InitialStateType;
+    dispatch: Dispatch<ReportActions>;
+}>({
+    state: initialState,
+    dispatch: () => null,
+});
+
+const mainReducer = (state: InitialStateType, action: ReportActions) => ({
+    state: reportReducer(state, action),
+});
+
+const AppProvider: React.FC = ({ children }) => {
+    const [state, dispatch] = useReducer(mainReducer, initialState);
+
+    return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
+};
+
+export { AppProvider, AppContext };
