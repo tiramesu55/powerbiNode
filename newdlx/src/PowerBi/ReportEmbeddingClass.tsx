@@ -93,10 +93,41 @@ export default class ReportEmbedding {
         } as models.ICustomLayout;
 
         const renderSettings = {
-            filterPaneEnabled: false,
-            navContentPaneEnabled: false,
+            //filterPaneEnabled: true,
+            //    navContentPaneEnabled: false,
             layoutType: showMobileLayout ? models.LayoutType.MobilePortrait : models.LayoutType.Custom,
             customLayout: layoutSettings,
+            bars: {
+                actionBar: {
+                    visible: false,
+                },
+            },
+            background: models.BackgroundType.Default,
+            panes: {
+                visualizations: {
+                    visible: false,
+                    expanded: false,
+                },
+                bookmarks: {
+                    visible: false,
+                },
+                fields: {
+                    visible: false,
+                    expanded: false,
+                },
+                filters: {
+                    visible: false,
+                },
+                pageNavigation: {
+                    visible: false,
+                },
+                selection: {
+                    visible: false,
+                },
+                syncSlicers: {
+                    visible: false,
+                },
+            },
         } as IEmbedSettings;
 
         return {
@@ -105,8 +136,9 @@ export default class ReportEmbedding {
             accessToken: embedModel.accessToken,
             type: 'report',
             tokenType: pbi.models.TokenType.Embed,
-            permissions: models.Permissions.All,
+            permissions: models.Permissions.ReadWrite,
             settings: renderSettings,
+            viewMode: models.ViewMode.Edit,
         } as IEmbedConfiguration;
     }
 
@@ -121,8 +153,8 @@ export default class ReportEmbedding {
         report.off('loaded');
         report.on('loaded', () => {
             this.handleTokenExpiration(report, reportName);
-            if (false) this.setContainerHeight(report, hostContainer, showMobileLayout);
-            this.layoutVisuals(report, hostContainer);
+            this.setContainerHeight(report, hostContainer, showMobileLayout);
+            if (false) this.layoutVisuals(report, hostContainer);
         });
         report.off('buttonClicked');
         report.on('buttonClicked', (event) => {
@@ -183,7 +215,7 @@ export default class ReportEmbedding {
                 }
             });
         });
-        //     report.switchMode('edit').then((res) => console.log(res));
+        //    report.switchMode('edit').then((res) => console.log(res));
     }
     private layoutVisuals(report: pbi.Report, hostContainer: HTMLDivElement) {
         report.getPages().then((pages: Array<pbi.Page>) => {
