@@ -12,6 +12,7 @@ const config = require('../config/config.json')
 const httpLogger = require('./httpLogger')
 const logger = require('./logger')
 const appInsights = require('applicationinsights');
+var busboy = require('connect-busboy'); 
 
 appInsights.setup('56ef7020-f083-4c06-af79-824503358d56')
 .setAutoCollectExceptions(true)
@@ -37,6 +38,8 @@ const swaggerDocument = swaggerJsDoc(swaggerOptions)
 
 const app = express();
 app.use(cors())
+app.use(busboy());
+app.use(express.static(path.join(__dirname, 'public')));
 // Prepare server for Bootstrap, jQuery and PowerBI files
 app.use('/js', express.static('./node_modules/bootstrap/dist/js/')); // Redirect bootstrap JS
 app.use('/js', express.static('./node_modules/jquery/dist/')); // Redirect JS jQuery
@@ -161,6 +164,30 @@ app.get('/getToken', async function (req, res) {
         logger.error('This broke with error: ', err)
         res.status(500).send('Error!')
     }
+});
+
+app.post('/upload',async function (req, res) {
+    console.log( "get..." )
+    var fstream;
+    req.pipe(req.busboy);
+    req.busboy.on('file', function (fieldname, file, filename) {
+        console.log("Uploading: " + filename);
+
+        //Path where image will be uploaded
+        fstream = fs.createWriteStream(__dirname + '/img/' + filename);
+        file.pipe(fstream);
+        fstream.on('close', function () {    
+            console.log("Upload Finished of " + filename);   
+            embedToken.importReport(config.workspaceId).then( data => {
+                res.status(200).send(data);
+            }).catch( error => {
+                res.status(500).send(error);
+            })   
+        });
+        fstream.on('error', function (error) {    
+            console.log("error " + error);    
+        });
+    });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

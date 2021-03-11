@@ -10,6 +10,8 @@ const PowerBiReportDetails = require(__dirname + "/../models/embedReportConfig.j
 const EmbedConfig = require(__dirname + "/../models/embedConfig.js");
 const fetch = require('node-fetch');
 
+const fs = require('fs')
+
 /**
  * Generate embed token and embed urls for reports
  * @return Details like Embed URL, Access token and Expiry
@@ -33,6 +35,40 @@ async function getEmbedInfo() {
             'status': err.status,
             'error': `Error while retrieving report embed details\r\n${err.statusText}\r\nRequestId: \n${err.headers.get('requestid')}`
         }
+    }
+}
+/**
+ * Get embed params for a single workspace
+ * @param {string} workspaceId
+ * @return EmbedConfig object
+ */
+ async function importReport(workspaceId) {
+    try {
+        const importInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/imports?datasetDisplayName=Test'`;
+        const headers = await getRequestHeader();
+
+        // Get report info by calling the PowerBI REST API
+        console.log( headers )
+        console.log( __dirname )
+        const result = await fetch(importInGroupApi, {
+            method: 'POST',
+            headers: {
+                ...headers,
+                'Content-Type': 'multipart/form-data'
+            },
+            body: fs.createReadStream(__dirname + '/img/Report.pbix'),
+        })
+        console.log(data)
+        if (!result.ok) {
+            throw result;
+        }
+        const data = await response.json();
+
+        // Convert result in json to retrieve values
+        return Promise.resolve(data);
+    } catch(err){
+        console.log( err )
+        return Promise.reject("Error")
     }
 }
 
@@ -403,5 +439,6 @@ module.exports = {
     getEmbedInfo: getEmbedInfo,
     getToken: getToken,
     getReports: getReports,
-    getEmbedParamsForSingleReport: getEmbedParamsForSingleReport
+    getEmbedParamsForSingleReport: getEmbedParamsForSingleReport,
+    importReport: importReport
 }

@@ -19,6 +19,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import ListReports from './ListReports';
+import UploadButtons from './uploadComponent';
 
 const drawerWidth = 240;
 
@@ -97,7 +98,7 @@ export default function ResponsiveDrawer(props: Props) {
                     </IconButton>
                 </Grid>
             </Grid>
-
+            <UploadButtons />
             <ListReports reports={props.reports} setReport={props.setReport} />
         </>
     );
