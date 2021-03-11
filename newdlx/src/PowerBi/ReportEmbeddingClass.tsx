@@ -98,13 +98,15 @@ export default class ReportEmbedding {
             layoutType: showMobileLayout ? models.LayoutType.MobilePortrait : models.LayoutType.Custom,
             customLayout: layoutSettings,
             bars: {
+                //top bar save...
                 actionBar: {
                     visible: false,
                 },
             },
-            background: models.BackgroundType.Default,
+            background: models.BackgroundType.Default, //check what it does
             panes: {
                 visualizations: {
+                    //check what this does
                     visible: false,
                     expanded: false,
                 },
@@ -112,6 +114,7 @@ export default class ReportEmbedding {
                     visible: false,
                 },
                 fields: {
+                    //check
                     visible: false,
                     expanded: false,
                 },
@@ -138,7 +141,7 @@ export default class ReportEmbedding {
             tokenType: pbi.models.TokenType.Embed,
             permissions: models.Permissions.ReadWrite,
             settings: renderSettings,
-            viewMode: models.ViewMode.Edit,
+            viewMode: models.ViewMode.Edit, //do not use setting mode on the report
         } as IEmbedConfiguration;
     }
 
@@ -215,7 +218,7 @@ export default class ReportEmbedding {
                 }
             });
         });
-        //    report.switchMode('edit').then((res) => console.log(res));
+        //    report.switchMode('edit').then((res) => console.log(res));    //if use this then cannot hide panels
     }
     private layoutVisuals(report: pbi.Report, hostContainer: HTMLDivElement) {
         report.getPages().then((pages: Array<pbi.Page>) => {
