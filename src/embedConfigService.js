@@ -44,21 +44,28 @@ async function getEmbedInfo() {
  */
  async function importReport(workspaceId) {
     try {
-        const importInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/imports?datasetDisplayName=Test'`;
+        const importInGroupApi = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/imports?datasetDisplayName=Report`;
         const headers = await getRequestHeader();
 
         // Get report info by calling the PowerBI REST API
-        console.log( headers )
-        console.log( __dirname )
-        const result = await fetch(importInGroupApi, {
+        // console.log( headers )
+        // console.log( __dirname + '/img/Report.pbix' )
+        // fs.readFile(__dirname + '/img/Report.pbix', (err, data) => {
+        //     console.log( err )
+        //     console.log( data )
+        // })
+        const  options = {
             method: 'POST',
             headers: {
                 ...headers,
+               // 'Authorization': headers.Authorization
                 'Content-Type': 'multipart/form-data'
             },
             body: fs.createReadStream(__dirname + '/img/Report.pbix'),
-        })
-        console.log(data)
+        }
+  //      console.log( options )
+        const result = await fetch(importInGroupApi, options)
+      //  console.log(fs.createReadStream(__dirname + '/img/Report.pbix'))
         if (!result.ok) {
             throw result;
         }

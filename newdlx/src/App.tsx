@@ -14,6 +14,7 @@ import ReportBiClientComponent from './components/ReportBiClientComponent';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin, appInsights } from './Azure/AppInsights';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { Button, Grid } from '@material-ui/core';
 //import Hidden from '@material-ui/core/Hidden';
 interface Report {
     reportId: string;
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const App = (): React.ReactElement => {
     const [reports, setReports] = useState<Report[]>();
     const [reportActive, setReportActive] = useState<Report>();
+    const [editMode, setEditMode] = useState<boolean>(false);
 
     const classes = useStyles();
 
@@ -81,7 +83,9 @@ const App = (): React.ReactElement => {
         const reportActive = reports?.find((el) => el.reportId === reportId);
         setReportActive(reportActive);
     };
-
+    const handleEdimodeChange = () => {
+        setEditMode(!editMode);
+    };
     return (
         <div className={classes.root}>
             {reports?.length && (
@@ -90,8 +94,29 @@ const App = (): React.ReactElement => {
                     {reportActive && (
                         <main className={classes.content}>
                             <div className={classes.toolbar} />
+                            <Grid container alignItems="center" justify="center">
+                                {editMode && (
+                                    <Grid item>
+                                        <span style={{ fontSize: 16, paddingRight: 20 }}>!!!Edit Mode!!!</span>
+                                    </Grid>
+                                )}
+                                <Grid item>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        component="span"
+                                        onClick={handleEdimodeChange}
+                                    >
+                                        Edit Mode
+                                    </Button>
+                                </Grid>
+                            </Grid>
                             {/* <ReportComponent reportId={reportActive.reportId} /> */}
-                            <ReportBiClientComponent reportId={reportActive.reportId} appInsights={appInsights} />
+                            <ReportBiClientComponent
+                                reportId={reportActive.reportId}
+                                appInsights={appInsights}
+                                editMode={editMode}
+                            />
                         </main>
                     )}
                 </>

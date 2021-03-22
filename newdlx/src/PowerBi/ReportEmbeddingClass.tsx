@@ -11,6 +11,16 @@ interface IReportEmbedModel {
     accessToken: string;
 }
 
+export interface VisualInterface {
+    height: number;
+    width: number;
+    x: number;
+    y: number;
+    z: number;
+    title: string;
+    page: number;
+}
+
 const ColumnsNumber = {
     One: 1,
     Two: 2,
@@ -30,30 +40,44 @@ const LayoutShowcaseState = {
 };
 
 export default class ReportEmbedding {
+    [x: string]: any;
+    public report: pbi.Report | null;
     private pbiService: pbi.service.Service;
     private instAI: ApplicationInsights;
-    constructor(appInsights: any) {
+    constructor(appInsights: any, setVisuals: any, setReport: any) {
         this.pbiService = new pbi.service.Service(
             pbi.factories.hpmFactory,
             pbi.factories.wpmpFactory,
             pbi.factories.routerFactory,
         );
         this.instAI = appInsights;
+        this.setVisuals = setVisuals;
+        this.setReport = setReport;
+        this.report = null;
     }
 
     public resetElem(hostContainer: HTMLDivElement): void {
         this.pbiService.reset(hostContainer);
     }
-
-    public embedReport(reportId: string, hostContainer: HTMLDivElement, showMobileLayout: boolean): void {
+    // private setReport(report: pbi.Report): void {
+    //     console.log(report);
+    //     this.report = report;
+    // }
+    public embedReport(
+        reportId: string,
+        hostContainer: HTMLDivElement,
+        showMobileLayout: boolean,
+        editMode: boolean,
+        visuals: [VisualInterface] | null,
+    ): void {
         //this.instAI.trackEvent({ name: 'embed start', properties: { id: 'slava', time: new Date().getTime() } });
         //   this.instAI.trackException({ error: new Error('Error'), severityLevel: SeverityLevel.Error });
         const start = new Date().getTime();
         this.getReportEmbedModel(reportId)
             .then((apiResponse) => this.getReportEmbedModelFromResponse(apiResponse))
-            .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout))
+            .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout, editMode))
             .then((reportConfiguration) => {
-                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout);
+                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout, visuals);
 
                 this.instAI.trackEvent({
                     name: `embed report ${reportId}`,
@@ -87,6 +111,7 @@ export default class ReportEmbedding {
     private buildReportEmbedConfiguration(
         embedModel: IReportEmbedModel,
         showMobileLayout: boolean,
+        editMode: boolean,
     ): IEmbedConfiguration {
         const layoutSettings = {
             displayOption: models.DisplayOption.FitToWidth,
@@ -141,7 +166,7 @@ export default class ReportEmbedding {
             tokenType: pbi.models.TokenType.Embed,
             permissions: models.Permissions.ReadWrite,
             settings: renderSettings,
-            viewMode: models.ViewMode.Edit, //do not use setting mode on the report
+            viewMode: editMode ? models.ViewMode.Edit : models.ViewMode.View, //do not use setting mode on the report
         } as IEmbedConfiguration;
     }
 
@@ -150,14 +175,17 @@ export default class ReportEmbedding {
         hostContainer: HTMLDivElement,
         reportName: string,
         showMobileLayout: boolean,
+        visuals: [VisualInterface] | null,
     ): void {
         const report = this.pbiService.embed(hostContainer, reportConfiguration) as pbi.Report;
-
         report.off('loaded');
         report.on('loaded', () => {
+            this.setReport(report);
             this.handleTokenExpiration(report, reportName);
-            this.setContainerHeight(report, hostContainer, showMobileLayout);
-            if (false) this.layoutVisuals(report, hostContainer);
+            if (true) this.setContainerHeight(report, hostContainer, showMobileLayout);
+            // if (!editMode) this.getVisuals(report);
+            console.log(visuals);
+            if (visuals) this.layoutVisuals(report, hostContainer, visuals);
         });
         report.off('buttonClicked');
         report.on('buttonClicked', (event) => {
@@ -220,7 +248,32 @@ export default class ReportEmbedding {
         });
         //    report.switchMode('edit').then((res) => console.log(res));    //if use this then cannot hide panels
     }
-    private layoutVisuals(report: pbi.Report, hostContainer: HTMLDivElement) {
+    public getVisuals(report: pbi.Report | null) {
+        return new Promise((resolve) => {
+            report?.getPages().then((p: Array<pbi.Page>) => {
+                let pageNumber = 0;
+                const activePage = p.filter((page, index) => {
+                    if (page.isActive) pageNumber = index;
+                    return page.isActive;
+                })[0];
+                // Retrieve active page visuals.
+                activePage.getVisuals().then((visuals) => {
+                    resolve(
+                        visuals.map((el) => ({
+                            height: el.layout.height,
+                            width: el.layout.width,
+                            x: el.layout.x,
+                            y: el.layout.y,
+                            z: el.layout.z,
+                            title: el.title,
+                            page: pageNumber,
+                        })),
+                    );
+                });
+            });
+        });
+    }
+    private layoutVisuals(report: pbi.Report, hostContainer: HTMLDivElement, visualsData: [VisualInterface] | null) {
         report.getPages().then((pages: Array<pbi.Page>) => {
             // Retrieve active page
             const activePage = pages.filter((page) => page.isActive)[0];
@@ -231,6 +284,7 @@ export default class ReportEmbedding {
 
             // Retrieve active page visuals.
             activePage.getVisuals().then(function (visuals) {
+                console.log(visuals);
                 const reportVisuals = visuals.map(function (visual) {
                     return {
                         name: visual.name,
@@ -273,10 +327,7 @@ export default class ReportEmbedding {
                 const checkedVisuals = layoutVisuals.filter(function (visual) {
                     return visual.checked;
                 });
-                // Visuals starting point
-                let x = LayoutShowcaseConsts.margin,
-                    y = checkedVisuals.length * (height + LayoutShowcaseConsts.margin),
-                    y2 = LayoutShowcaseConsts.margin;
+                console.log(checkedVisuals);
 
                 // Calculate the number of lines
                 const lines = Math.ceil(checkedVisuals.length / LayoutShowcaseState.columns);
@@ -288,25 +339,19 @@ export default class ReportEmbedding {
                 // You can find more information at https://github.com/Microsoft/PowerBI-JavaScript/wiki/Custom-Layout
                 const visualsLayout: { [key: string]: models.IVisualLayout } = {};
                 for (let i = 0; i < checkedVisuals.length; i++) {
+                    const visual = visualsData?.find((el) => el.title === checkedVisuals[i].title);
+                    console.log(checkedVisuals[i]);
                     visualsLayout[checkedVisuals[i].name] = {
-                        x: x,
-                        y: y2,
-                        width: width,
-                        height: height,
+                        x: visual?.x,
+                        y: visual?.y,
+                        width: visual?.width,
+                        height: visual?.height,
+                        z: visual?.z,
                         displayState: {
                             // Change the selected visuals display mode to visible
                             mode: models.VisualContainerDisplayMode.Visible,
                         },
                     };
-
-                    // Calculating (x,y) position for the next visual
-                    x += width + LayoutShowcaseConsts.margin;
-                    if (x + width > pageWidth) {
-                        x = LayoutShowcaseConsts.margin;
-                        y = (checkedVisuals.length - i - 1) * (height + LayoutShowcaseConsts.margin);
-                        y2 += height - 2 * LayoutShowcaseConsts.margin;
-                        console.log(y, y2);
-                    }
                 }
                 console.log(visualsLayout);
                 // Building pagesLayout object
@@ -333,7 +378,40 @@ export default class ReportEmbedding {
                         displayOption: models.DisplayOption.FitToPage,
                         pagesLayout: pagesLayout,
                     },
-                    background: 0,
+                    bars: {
+                        //top bar save...
+                        actionBar: {
+                            visible: false,
+                        },
+                    },
+                    background: models.BackgroundType.Default, //check what it does
+                    panes: {
+                        visualizations: {
+                            //check what this does
+                            visible: false,
+                            expanded: false,
+                        },
+                        bookmarks: {
+                            visible: false,
+                        },
+                        fields: {
+                            //check
+                            visible: false,
+                            expanded: false,
+                        },
+                        filters: {
+                            visible: false,
+                        },
+                        pageNavigation: {
+                            visible: false,
+                        },
+                        selection: {
+                            visible: false,
+                        },
+                        syncSlicers: {
+                            visible: false,
+                        },
+                    },
                 };
 
                 // Change page background to transparent on Two / Three columns configuration
