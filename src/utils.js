@@ -2,8 +2,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 // ----------------------------------------------------------------------------
-
+const fs = require('fs')
 let config = require(__dirname + "/../config/config.json");
+
+const getReportInfoData = (reportId) => {
+    return new Promise( resolve => {
+        fs.readFile(__dirname + '/reportInfo/' + reportId, 'utf8' , (err, data) => {
+            if (err) {
+              console.error(err)
+              resolve( null )
+            }
+            resolve(JSON.parse(data));
+        })
+    })
+}
+
 
 function getAuthHeader(accessToken) {
 
@@ -79,4 +92,5 @@ function validateConfig() {
 module.exports = {
     getAuthHeader: getAuthHeader,
     validateConfig: validateConfig,
+    getReportInfoData: getReportInfoData,
 }

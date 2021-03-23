@@ -44,14 +44,13 @@ export default class ReportEmbedding {
     public report: pbi.Report | null;
     private pbiService: pbi.service.Service;
     private instAI: ApplicationInsights;
-    constructor(appInsights: any, setVisuals: any, setReport: any) {
+    constructor(appInsights: any, setReport: any) {
         this.pbiService = new pbi.service.Service(
             pbi.factories.hpmFactory,
             pbi.factories.wpmpFactory,
             pbi.factories.routerFactory,
         );
         this.instAI = appInsights;
-        this.setVisuals = setVisuals;
         this.setReport = setReport;
         this.report = null;
     }
@@ -182,39 +181,12 @@ export default class ReportEmbedding {
         report.on('loaded', () => {
             this.setReport(report);
             this.handleTokenExpiration(report, reportName);
-            if (true) this.setContainerHeight(report, hostContainer, showMobileLayout);
-            // if (!editMode) this.getVisuals(report);
-            console.log(visuals);
+            this.setContainerHeight(report, hostContainer, showMobileLayout);
             if (visuals) this.layoutVisuals(report, hostContainer, visuals);
         });
-        report.off('buttonClicked');
-        report.on('buttonClicked', (event) => {
-            console.log('buttonClicked', event);
-        });
-
-        report.off('commandTriggered');
-        report.on('commandTriggered', (event) => {
-            console.log('commandTriggered', event);
-        });
-
-        report.off('dataHyperlinkClicked');
-        report.on('dataHyperlinkClicked', (event) => {
-            console.log('dataHyperlinkClicked', event);
-        });
-
         report.off('visualClicked');
         report.on('visualClicked', (event) => {
             console.log('visualClicked', event);
-        });
-
-        report.off('selectionChanged');
-        report.on('selectionChanged', (event) => {
-            console.log('selectionChanged', event);
-        });
-
-        report.off('dataSelected');
-        report.on('dataSelected', (event) => {
-            console.log('dataSelected', event);
         });
     }
 
@@ -284,7 +256,6 @@ export default class ReportEmbedding {
 
             // Retrieve active page visuals.
             activePage.getVisuals().then(function (visuals) {
-                console.log(visuals);
                 const reportVisuals = visuals.map(function (visual) {
                     return {
                         name: visual.name,
@@ -327,8 +298,6 @@ export default class ReportEmbedding {
                 const checkedVisuals = layoutVisuals.filter(function (visual) {
                     return visual.checked;
                 });
-                console.log(checkedVisuals);
-
                 // Calculate the number of lines
                 const lines = Math.ceil(checkedVisuals.length / LayoutShowcaseState.columns);
 
@@ -340,7 +309,6 @@ export default class ReportEmbedding {
                 const visualsLayout: { [key: string]: models.IVisualLayout } = {};
                 for (let i = 0; i < checkedVisuals.length; i++) {
                     const visual = visualsData?.find((el) => el.title === checkedVisuals[i].title);
-                    console.log(checkedVisuals[i]);
                     visualsLayout[checkedVisuals[i].name] = {
                         x: visual?.x,
                         y: visual?.y,
@@ -353,7 +321,6 @@ export default class ReportEmbedding {
                         },
                     };
                 }
-                console.log(visualsLayout);
                 // Building pagesLayout object
                 const pagesLayout: { [key: string]: models.IPageLayout } = {};
                 pagesLayout[LayoutShowcaseState.layoutPageName] = {

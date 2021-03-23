@@ -166,6 +166,47 @@ app.get('/getToken', async function (req, res) {
     }
 });
 
+app.post('/setReportInfo',async function (req, res) {
+    console.log( "set... ReportInfo..." )
+    if(req.body.info){
+        const data = JSON.stringify(req.body.info);
+
+        // write JSON string to a file
+        fs.writeFile(__dirname + '/reportInfo/' + req.body.report, data, (err) => {
+            if (err) {
+                res.status(500).send(error);
+            }
+            console.log("JSON data is saved.");
+            res.status(200).send("Data was saved...");
+        });
+    }
+});
+
+app.get('/getReportInfo/:reportId', async function (req, res) {
+    try {
+        // Validate whether all the required configurations are provided in config.json
+        configCheckResult = utils.validateConfig();
+        if (configCheckResult) {
+            logger.error('This broke with error: ', configCheckResult)
+            return {
+                "status": 400,
+                "error": configCheckResult
+            };
+        }
+        // Get the details like Embed URL, Access token and Expiry
+        const result = await utils.getReportInfoData(req.params.reportId);
+ 
+        // result.status specified the statusCode that will be sent along with the result object
+     //   res.status(500).send("Error");
+        res.status(200).send(result);
+    } catch(err) {
+        logger.error('This broke with error: ', err)
+        res.status(502).send({
+            error: err.toString()
+        })
+    }
+});
+
 app.post('/upload',async function (req, res) {
     console.log( "get..." )
     var fstream;
