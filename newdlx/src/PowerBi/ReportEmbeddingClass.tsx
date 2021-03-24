@@ -19,6 +19,7 @@ export interface VisualInterface {
     z: number;
     title: string;
     page: number;
+    visible: boolean;
 }
 
 const ColumnsNumber = {
@@ -76,7 +77,7 @@ export default class ReportEmbedding {
             .then((apiResponse) => this.getReportEmbedModelFromResponse(apiResponse))
             .then((responseContent) => this.buildReportEmbedConfiguration(responseContent, showMobileLayout, editMode))
             .then((reportConfiguration) => {
-                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout, visuals);
+                this.runEmbedding(reportConfiguration, hostContainer, reportId, showMobileLayout, visuals, editMode);
 
                 this.instAI.trackEvent({
                     name: `embed report ${reportId}`,
@@ -175,6 +176,7 @@ export default class ReportEmbedding {
         reportName: string,
         showMobileLayout: boolean,
         visuals: [VisualInterface] | null,
+        editMode: boolean,
     ): void {
         const report = this.pbiService.embed(hostContainer, reportConfiguration) as pbi.Report;
         report.off('loaded');
@@ -182,7 +184,7 @@ export default class ReportEmbedding {
             this.setReport(report);
             this.handleTokenExpiration(report, reportName);
             this.setContainerHeight(report, hostContainer, showMobileLayout);
-            if (visuals) this.layoutVisuals(report, hostContainer, visuals);
+            if (visuals) this.layoutVisuals(report, hostContainer, visuals, editMode);
         });
         report.off('visualClicked');
         report.on('visualClicked', (event) => {
@@ -245,7 +247,12 @@ export default class ReportEmbedding {
             });
         });
     }
-    private layoutVisuals(report: pbi.Report, hostContainer: HTMLDivElement, visualsData: [VisualInterface] | null) {
+    private layoutVisuals(
+        report: pbi.Report,
+        hostContainer: HTMLDivElement,
+        visualsData: [VisualInterface] | null,
+        editMode: boolean,
+    ) {
         report.getPages().then((pages: Array<pbi.Page>) => {
             // Retrieve active page
             const activePage = pages.filter((page) => page.isActive)[0];
@@ -317,7 +324,10 @@ export default class ReportEmbedding {
                         z: visual?.z,
                         displayState: {
                             // Change the selected visuals display mode to visible
-                            mode: models.VisualContainerDisplayMode.Visible,
+                            mode:
+                                visual?.visible || editMode
+                                    ? models.VisualContainerDisplayMode.Visible
+                                    : models.VisualContainerDisplayMode.Hidden,
                         },
                     };
                 }

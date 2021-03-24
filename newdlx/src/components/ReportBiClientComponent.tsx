@@ -4,9 +4,11 @@
 import React, { useEffect } from 'react';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Grid from '@material-ui/core/Grid';
 import ReportEmbedding from '../PowerBi/ReportEmbeddingClass';
 import * as pbi from 'powerbi-client';
 import axios from 'axios';
+import VisibleFilter from './VisibleFilter';
 
 export interface IReportProps {
     reportId: string;
@@ -22,6 +24,7 @@ export interface VisualInterface {
     z: number;
     title: string;
     page: number;
+    visible: boolean;
 }
 
 export interface ToSendVisuals {
@@ -47,6 +50,7 @@ function ReportBiClientComponent(props: IReportProps) {
             .get<any>(`http://localhost:5300/getReportInfo/${props.reportId}`)
             .then((resp): any => {
                 setVisuals(resp.data);
+                console.log(resp.data);
                 return resp.data;
             })
             .catch((err) => console.log(err));
@@ -103,10 +107,17 @@ function ReportBiClientComponent(props: IReportProps) {
         if (!props.editMode) {
             const container = Object.assign({}, reportContainer);
             reportEmbedding.getVisuals(report).then((res: any) => {
-                setVisualsData(res);
+                const visualsVis = res.map((el: any) => {
+                    const visual = visuals?.find((item) => item.title === el.title);
+                    return {
+                        ...el,
+                        visible: visual?.visible,
+                    };
+                });
+                setVisualsData(visualsVis);
                 container &&
                     container.current &&
-                    embeding(props.reportId, container.current, isMobileViewport, props.editMode, res);
+                    embeding(props.reportId, container.current, isMobileViewport, props.editMode, visualsVis);
             });
         } else {
             reportContainer &&
@@ -115,7 +126,30 @@ function ReportBiClientComponent(props: IReportProps) {
         }
         //console.log(report);
     }, [props.editMode]);
+    const handleChecked = (value: string) => {
+        const newVis =
+            visuals &&
+            (visuals.map((el) => ({
+                ...el,
+                visible: el.title === value ? !el.visible : el.visible,
+            })) as [VisualInterface] | null);
 
-    return <div ref={reportContainer} className={classes.container} />;
+        setVisualsData(newVis);
+        reportContainer &&
+            reportContainer.current &&
+            embeding(props.reportId, reportContainer.current, isMobileViewport, props.editMode, newVis);
+    };
+    return (
+        <Grid container alignItems="flex-start" justify="center">
+            <Grid item xs={10}>
+                <div ref={reportContainer} className={classes.container} />
+            </Grid>
+            {visuals && (
+                <Grid item xs={2}>
+                    <VisibleFilter visuals={visuals} handleChecked={handleChecked} />
+                </Grid>
+            )}
+        </Grid>
+    );
 }
 export default ReportBiClientComponent;
