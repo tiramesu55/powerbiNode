@@ -1,7 +1,3 @@
-// ----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-// ----------------------------------------------------------------------------
 
 // Properties for embedding the report 
 class EmbedConfig {
