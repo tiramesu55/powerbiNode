@@ -1,7 +1,4 @@
-// ----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-// ----------------------------------------------------------------------------
+
 
 // Configurations of the embedded reports
 class PowerBiReportDetails {

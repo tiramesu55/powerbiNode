@@ -144,28 +144,29 @@ app.get('/getReportsByGroup', async function (req, res) {
  *       '200': 
  *          description: A successful response
  */
-app.get('/getToken', async function (req, res) {
-    try {
-        // Validate whether all the required configurations are provided in config.json
-        configCheckResult = utils.validateConfig();
-        if (configCheckResult) {
-            logger.error('This broke with error: ', configCheckResult)
-            return {
-                "status": 400,
-                "error": configCheckResult
-            };
-        }
-        // Get the details like Embed URL, Access token and Expiry
-        let result = await embedToken.getToken();
+// app.get('/getToken', async function (req, res) {
+//     try {
+//         // Validate whether all the required configurations are provided in config.json
+//         configCheckResult = utils.validateConfig();
+//         if (configCheckResult) {
+//             logger.error('This broke with error: ', configCheckResult)
+//             return {
+//                 "status": 400,
+//                 "error": configCheckResult
+//             };
+//         }
+//         // Get the details like Embed URL, Access token and Expiry
+//         let result = await embedToken.getToken();
 
-        // result.status specified the statusCode that will be sent along with the result object
-        res.status(200).send(result);
-    } catch(err) {
-        logger.error('This broke with error: ', err)
-        res.status(500).send('Error!')
-    }
-});
+//         // result.status specified the statusCode that will be sent along with the result object
+//         res.status(200).send(result);
+//     } catch(err) {
+//         logger.error('This broke with error: ', err)
+//         res.status(500).send('Error!')
+//     }
+// });
 
+//this is needed id we are modifying report.  
 app.post('/setReportInfo',async function (req, res) {
     console.log( "set... ReportInfo..." )
     if(req.body.info){
@@ -206,7 +207,7 @@ app.get('/getReportInfo/:reportId', async function (req, res) {
         })
     }
 });
-
+//this is for uploading report and not currently used
 app.post('/upload',async function (req, res) {
     console.log( "get..." )
     var fstream;

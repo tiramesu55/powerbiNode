@@ -1,13 +1,8 @@
-// ----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-// ----------------------------------------------------------------------------
-
-const auth = require(__dirname + "/authentication.js");
-const config = require(__dirname + "/../config/config.json");
-const utils = require(__dirname + "/utils.js");
-const PowerBiReportDetails = require(__dirname + "/../models/embedReportConfig.js");
-const EmbedConfig = require(__dirname + "/../models/embedConfig.js");
+const auth = require( "./authentication.js");
+const config = require("../config/config.json");
+const utils = require( "./utils.js");
+const PowerBiReportDetails = require("../models/embedReportConfig.js");
+const EmbedConfig = require("../models/embedConfig.js");
 const fetch = require('node-fetch');
 
 const fs = require('fs')

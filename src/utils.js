@@ -1,7 +1,4 @@
-// ----------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-// ----------------------------------------------------------------------------
+
 const fs = require('fs')
 let config = require(__dirname + "/../config/config.json");
 
@@ -44,14 +41,6 @@ function validateConfig() {
 
     if (!guid.isGuid(config.clientId)) {
         return "ClientId must be a Guid object. Please register your application as Native app in https://dev.powerbi.com/apps and fill Client Id in config.json.";
-    }
-
-    if (!config.reportId) {
-        return "ReportId is empty. Please select a report you own and fill its Id in config.json.";
-    }
-
-    if (!guid.isGuid(config.reportId)) {
-        return "ReportId must be a Guid object. Please select a report you own and fill its Id in config.json.";
     }
 
     if (!config.workspaceId) {
