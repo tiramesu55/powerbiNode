@@ -29,12 +29,7 @@ const swaggerDocument = swaggerJsDoc(swaggerOptions)
 
 const app = express();
 app.use(cors())
-// Prepare server for Bootstrap, jQuery and PowerBI files
-app.use('/js', express.static('./node_modules/bootstrap/dist/js/')); // Redirect bootstrap JS
-app.use('/js', express.static('./node_modules/jquery/dist/')); // Redirect JS jQuery
-app.use('/js', express.static('./node_modules/powerbi-client/dist/')) // Redirect JS PowerBI
-app.use('/css', express.static('./node_modules/bootstrap/dist/css/')); // Redirect CSS bootstrap
-app.use('/public', express.static('./public/')); // Use custom JS and CSS files
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(httpLogger)
