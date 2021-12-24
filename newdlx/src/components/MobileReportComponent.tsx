@@ -53,7 +53,7 @@ export default function MobileReportComponent(props: IReportProps) {
     let report: Report;
     const getReport = async () =>
         axios
-            .post<apiConfig>('http://localhost:5300/getReport', { reportId: props.reportId })
+            .post<apiConfig>('http://localhost:7071/api/getReport', { reportId: props.reportId })
             .then((resp): void => {
                 const reportCon = {
                     ...sampleReportConfig,

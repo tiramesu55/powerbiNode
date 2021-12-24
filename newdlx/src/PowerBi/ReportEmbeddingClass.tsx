@@ -40,7 +40,7 @@ export default class ReportEmbedding {
     }
 
     private getReportEmbedModel(reportId: string): Promise<Response> {
-        const request = new Request('http://localhost:5300/getReport', {
+        const request = new Request('http://localhost:7071/api/getReport', {
             headers: {
                 'Content-Type': 'application/json',
             },

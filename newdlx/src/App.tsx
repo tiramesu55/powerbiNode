@@ -74,7 +74,7 @@ const App = (): React.ReactElement => {
     const theme = useTheme();
     const getReports = async () =>
         axios
-            .get<Report[]>('http://localhost:5300/getReportsByGroup')
+            .get<Report[]>('http://localhost:7071/api/getReportsByGroup')
             .then((resp): void => {
                 setReports(resp.data);
             })
